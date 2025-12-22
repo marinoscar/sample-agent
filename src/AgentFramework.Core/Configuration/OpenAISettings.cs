@@ -8,7 +8,9 @@ namespace AgentFramework.Core.Configuration
 {
     public class OpenAISettings : AgentSettings
     {
+        public bool EnableCodeInterpreter { get { return bool.Parse(Settings[nameof(EnableCodeInterpreter)]); } set { Settings[nameof(EnableCodeInterpreter)] = value.ToString(); } }
         public bool EnableWebSearch { get { return bool.Parse(Settings[nameof(EnableWebSearch)]); } set { Settings[nameof(EnableWebSearch)] = value.ToString(); } }
+        public bool EnableImageGeneration { get { return bool.Parse(Settings[nameof(EnableImageGeneration)]); } set { Settings[nameof(EnableImageGeneration)] = value.ToString(); } }
         public static OpenAISettings Create(string instructions, string model = "gpt-4o-mini", double tem = 7.0d)
         {
             var key = Environment.GetEnvironmentVariable("OpenAIKey", EnvironmentVariableTarget.User);
@@ -19,7 +21,10 @@ namespace AgentFramework.Core.Configuration
                 Model = model,
                 Temperature = tem,
                 ApiKey = key,
-                Instructions = instructions
+                Instructions = instructions,
+                EnableCodeInterpreter = true,
+                EnableImageGeneration = false,
+                EnableWebSearch = true
             };
         }
     }

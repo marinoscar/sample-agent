@@ -17,14 +17,25 @@ namespace AgentFramework.Core.Agents
 
         public OpenAIAgent() : this(OpenAISettings.Create("You are a helpful assistant."))
         {
-            
+
         }
 
-        public OpenAIAgent(AgentSettings settings)
+        public OpenAIAgent(OpenAISettings settings)
         {
-            var webSearch = new WebSearchTool();
-            var aiTool = webSearch.AsAITool();
-            var tools = new List<AITool> { aiTool };
+            
+            var tools = new List<AITool>();
+
+            if (settings.EnableWebSearch)
+                tools.Add(new WebSearchTool().AsAITool());
+
+            if (settings.EnableCodeInterpreter)
+            {
+                var codeInterpreter = new CodeInterpreterTool(new CodeInterpreterToolContainer(Guid.NewGuid().ToString()));
+                tools.Add(codeInterpreter.AsAITool());
+            }
+
+            if (settings.EnableImageGeneration)
+                tools.Add(new ImageGenerationTool().AsAITool());
 
             var client = new OpenAIClient(settings.ApiKey);
 
@@ -33,7 +44,7 @@ namespace AgentFramework.Core.Agents
 
         }
 
-        
+
 
 
         public async Task StreamAsync(
@@ -44,7 +55,7 @@ namespace AgentFramework.Core.Agents
             if (string.IsNullOrWhiteSpace(prompt))
                 throw new ArgumentException("Prompt cannot be null/empty.", nameof(prompt));
 
-            if(onResponseUpdate == null)
+            if (onResponseUpdate == null)
                 throw new ArgumentNullException(nameof(onResponseUpdate));
 
 
