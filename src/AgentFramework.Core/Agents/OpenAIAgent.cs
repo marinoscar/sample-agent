@@ -11,9 +11,14 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Agents
 {
-    public class OpenAIAgent
+    public class OpenAIAgent : BaseAgent
     {
         private AIAgent _agent;
+
+        public OpenAIAgent() : this(OpenAISettings.Create("You are a helpful assistant."))
+        {
+            
+        }
 
         public OpenAIAgent(AgentSettings settings)
         {
@@ -28,8 +33,43 @@ namespace AgentFramework.Core.Agents
 
         }
 
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        
+
+
+        public async Task StreamAsync(
+        string prompt,
+        Action<AgentRunResponseUpdate> onResponseUpdate,
+        CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(prompt))
+                throw new ArgumentException("Prompt cannot be null/empty.", nameof(prompt));
+
+            if(onResponseUpdate == null)
+                throw new ArgumentNullException(nameof(onResponseUpdate));
+
+
+            // If your agent supports cancellation, pass it through (recommended).
+            // If it doesn’t, remove cancellationToken from the call below and keep the
+            // cancellationToken.ThrowIfCancellationRequested() inside the loop.
+            await foreach (var update in _agent.RunStreamingAsync(prompt, cancellationToken: cancellationToken)
+                                             .ConfigureAwait(false))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // Let exceptions in the callback fail the stream (usually what you want).
+                onResponseUpdate(update);
+            }
+        }
+
+        public void Stream(
+            string prompt,
+            Action<AgentRunResponseUpdate> onResponseUpdate,
+            CancellationToken cancellationToken = default)
+        {
+            StreamAsync(prompt, onResponseUpdate, cancellationToken)
+                .GetAwaiter()
+                .GetResult();
+        }
 
 
 
