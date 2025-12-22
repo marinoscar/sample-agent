@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AgentFramework.Core.Agents;
+using AgentFramework.Core.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
@@ -63,7 +65,26 @@ namespace AgentFramework.Terminal
         /// <param name="arguments">Parsed command-line options.</param>
         static void RunConsole(ConsoleOptions arguments)
         {
-            WriteLineInfo("Hello World");
+            Console.WriteLine("How can I help you?");
+            while (true)
+            {
+                var prompt = Console.ReadLine();
+                if (string.IsNullOrEmpty(prompt) || prompt.ToLowerInvariant() == "end")
+                    return;
+
+                var orignal = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Green;
+                var openAiAgent = new OpenAIAgent(OpenAISettings.Create("You are a web research agent and will look online for the responses"));
+                openAiAgent.Stream(prompt, (update) =>
+                {
+                    if (update == null)
+                        return;
+                    Console.Write(update.Text);
+                });
+                Console.ForegroundColor = orignal;
+                Console.WriteLine();
+                Console.WriteLine();
+            }
         }
 
 
