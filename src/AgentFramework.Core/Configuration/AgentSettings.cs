@@ -9,9 +9,9 @@ namespace AgentFramework.Core.Configuration
     public class AgentSettings
     {
         public IDictionary<string, string> Settings { get; set; } = new Dictionary<string, string>();
-        public string ApiKey { get { return Settings["ApiKey"]; } set { Settings["ApiKey"] = value; } }
-        public string Model { get { return Settings["Model"]; } set { Settings["Model"] = value; } }
-        public string Instructions { get { return Settings["Instructions"]; } set { Settings["Instructions"] = value; } }
-        public double Temperature { get { return double.Parse(Settings["Temperature"]); } set { Settings["Temperature"] = value.ToString(); } }
+        public string ApiKey { get { return Settings[nameof(ApiKey)]; } set { Settings[nameof(ApiKey)] = value; } }
+        public string Model { get { return Settings[nameof(Model)]; } set { Settings[nameof(Model)] = value; } }
+        public string Instructions { get { return Settings[nameof(Instructions)]; } set { Settings[nameof(Instructions)] = value; } }
+        public double Temperature { get { return double.Parse(Settings[nameof(Temperature)]); } set { Settings[nameof(Temperature)] = value.ToString(); } }
     }
 }
