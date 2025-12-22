@@ -8,7 +8,7 @@ namespace AgentFramework.Core.Configuration
 {
     public class OpenAISettings : AgentSettings
     {
-
+        public bool EnableWebSearch { get { return bool.Parse(Settings[nameof(EnableWebSearch)]); } set { Settings[nameof(EnableWebSearch)] = value.ToString(); } }
         public static OpenAISettings Create(string instructions, string model = "gpt-4o-mini", double tem = 7.0d)
         {
             var key = Environment.GetEnvironmentVariable("OpenAIKey", EnvironmentVariableTarget.User);
