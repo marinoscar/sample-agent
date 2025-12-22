@@ -11,18 +11,25 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Agents
 {
-    public class OpenAIAgent : BaseAgent
+    public class OpenAIAgent : BaseAgentWrapper
     {
-        private AIAgent _agent;
-
         public OpenAIAgent() : this(OpenAISettings.Create("You are a helpful assistant."))
         {
 
         }
 
-        public OpenAIAgent(OpenAISettings settings)
+        public OpenAIAgent(OpenAISettings settings) : base(settings)
         {
-            
+            InitializeAgent(settings);
+        }
+
+        protected override void InitializeAgent(AgentSettings settings)
+        {
+            InitializeAgent(OpenAISettings.FromAgentSettings(settings));
+        }
+
+        protected virtual void InitializeAgent(OpenAISettings settings)
+        {
             var tools = new List<AITool>();
 
             if (settings.EnableWebSearch)
@@ -40,17 +47,13 @@ namespace AgentFramework.Core.Agents
             var client = new OpenAIClient(settings.ApiKey);
 
             var responsesClient = client.GetResponsesClient(settings.Model);
-            _agent = responsesClient.CreateAIAgent(settings.Instructions, tools: tools);
-
+            Agent = responsesClient.CreateAIAgent(settings.Instructions, tools: tools);
         }
 
 
 
 
-        public async Task StreamAsync(
-        string prompt,
-        Action<AgentRunResponseUpdate> onResponseUpdate,
-        CancellationToken cancellationToken = default)
+        public async Task StreamAsync(string prompt, Action<AgentRunResponseUpdate> onResponseUpdate, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(prompt))
                 throw new ArgumentException("Prompt cannot be null/empty.", nameof(prompt));
@@ -62,7 +65,7 @@ namespace AgentFramework.Core.Agents
             // If your agent supports cancellation, pass it through (recommended).
             // If it doesn’t, remove cancellationToken from the call below and keep the
             // cancellationToken.ThrowIfCancellationRequested() inside the loop.
-            await foreach (var update in _agent.RunStreamingAsync(prompt, cancellationToken: cancellationToken)
+            await foreach (var update in Agent.RunStreamingAsync(prompt, cancellationToken: cancellationToken)
                                              .ConfigureAwait(false))
             {
                 cancellationToken.ThrowIfCancellationRequested();

@@ -27,5 +27,33 @@ namespace AgentFramework.Core.Configuration
                 EnableWebSearch = true
             };
         }
+
+        public static OpenAISettings FromAgentSettings(AgentSettings settings)
+        {
+            if (settings == null)
+                throw new ArgumentNullException(nameof(settings));
+
+            var openAISettings = new OpenAISettings
+            {
+                Model = settings.Model,
+                Temperature = settings.Temperature,
+                ApiKey = settings.ApiKey,
+                Instructions = settings.Instructions,
+                EnableCodeInterpreter = true,
+                EnableImageGeneration = false,
+                EnableWebSearch = true
+            };
+
+            // Copy any additional settings from the base Settings dictionary
+            foreach (var kvp in settings.Settings)
+            {
+                if (!openAISettings.Settings.ContainsKey(kvp.Key))
+                {
+                    openAISettings.Settings[kvp.Key] = kvp.Value;
+                }
+            }
+
+            return openAISettings;
+        }
     }
 }
