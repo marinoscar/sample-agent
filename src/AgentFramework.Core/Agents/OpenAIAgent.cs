@@ -1,6 +1,7 @@
 ﻿using AgentFramework.Core.Configuration;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenAI;
 using OpenAI.Responses;
 using System;
@@ -50,6 +51,9 @@ namespace AgentFramework.Core.Agents
 
             //Middle ware can be implemented on parameter clientFactory:https://learn.microsoft.com/en-us/agent-framework/user-guide/agents/agent-middleware?pivots=programming-language-csharp
             Agent = responsesClient.CreateAIAgent(settings.Instructions, tools: tools);
+
+            // HERE IS HOW YOU PROVIDE UI
+            //https://learn.microsoft.com/en-us/agent-framework/integrations/ag-ui/?pivots=programming-language-csharp
         }
 
 
