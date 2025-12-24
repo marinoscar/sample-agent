@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,7 @@ namespace AgentFramework.Core.Data
         DbSet<AgentMessage> AgentMessages { get; }
 
         Task<int> SaveChangesAsync(CancellationToken ct = default);
+
+        public DatabaseFacade Database { get; }
     }
 }
