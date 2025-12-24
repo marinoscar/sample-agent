@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Data
 {
-    public class Message
+    public class AgentMessage
     {
-        public ulong Id { get; set; }
+        public long Id { get; set; }  
         public string ThreadId { get; set; } = default!;
         public string MessageText { get; set; } = default!;
         public string SerializedMessage { get; set; } = default!;
         public DateTime UtcCreatedAt { get; set; }
-
     }
 }
