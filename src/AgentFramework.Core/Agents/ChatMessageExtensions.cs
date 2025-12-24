@@ -32,5 +32,23 @@ namespace AgentFramework.Core.Agents
                 UtcCreatedAt = chatMessage.CreatedAt.HasValue ? chatMessage.CreatedAt.Value.UtcDateTime : DateTime.UtcNow
             };
         }
+
+        public static ChatMessage ToChatMessage(this AgentMessage agentMessage)
+        {
+            if (agentMessage is null)
+                throw new ArgumentNullException(nameof(agentMessage));
+
+            if (string.IsNullOrWhiteSpace(agentMessage.SerializedMessage))
+                throw new InvalidOperationException("SerializedMessage is empty.");
+
+            var chatMessage = JsonSerializer.Deserialize<ChatMessage>(
+                agentMessage.SerializedMessage,
+                JsonOptions);
+
+            if (chatMessage is null)
+                throw new InvalidOperationException("Failed to deserialize ChatMessage.");
+
+            return chatMessage;
+        }
     }
 }
