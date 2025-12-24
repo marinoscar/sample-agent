@@ -1,4 +1,5 @@
-﻿using Microsoft.Agents.AI;
+﻿using AgentFramework.Core.Agents;
+using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using System;
 using System.Collections.Generic;
@@ -14,19 +15,26 @@ namespace AgentFramework.Core.Data
 
         private readonly IAgentMessageStore _agentMessageStore;
 
+        public string ThreadId { get; set; } = default!;
+
         public SqlChatMessageStore(IAgentMessageStore agentMessageStore)
         {
             _agentMessageStore = agentMessageStore ?? throw new ArgumentNullException(nameof(agentMessageStore));
         }
 
-        public override Task AddMessagesAsync(IEnumerable<ChatMessage> messages, CancellationToken cancellationToken = default)
+        public override async Task AddMessagesAsync(IEnumerable<ChatMessage> messages, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            await _agentMessageStore.AddRangeAsync(
+                ThreadId,
+                messages.Select(m => m.ToAgentMessage(ThreadId)),
+                cancellationToken);
         }
 
-        public override Task<IEnumerable<ChatMessage>> GetMessagesAsync(CancellationToken cancellationToken = default)
+        public override async Task<IEnumerable<ChatMessage>> GetMessagesAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _agentMessageStore
+                .GetByThreadIdAsync(ThreadId, cancellationToken)
+                .ContinueWith(t => t.Result.Select(m => m.ToChatMessage()), cancellationToken);
         }
 
         public override JsonElement Serialize(JsonSerializerOptions? jsonSerializerOptions = null)
