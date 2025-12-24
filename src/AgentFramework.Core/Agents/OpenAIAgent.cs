@@ -47,6 +47,8 @@ namespace AgentFramework.Core.Agents
             var client = new OpenAIClient(settings.ApiKey);
 
             var responsesClient = client.GetResponsesClient(settings.Model);
+
+            //Middle ware can be implemented on parameter clientFactory:https://learn.microsoft.com/en-us/agent-framework/user-guide/agents/agent-middleware?pivots=programming-language-csharp
             Agent = responsesClient.CreateAIAgent(settings.Instructions, tools: tools);
         }
 
