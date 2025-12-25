@@ -28,6 +28,14 @@ namespace AgentFramework.Core.Data
             e.Property(x => x.Id)
              .ValueGeneratedOnAdd();
 
+            e.Property(x => x.AgentId)
+             .IsRequired()
+             .HasMaxLength(100);
+
+            e.Property(x => x.AgentName)
+             .IsRequired()
+             .HasMaxLength(256);
+
             // ThreadId (required)
             e.Property(x => x.ThreadId)
              .IsRequired()
