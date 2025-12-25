@@ -45,6 +45,9 @@ namespace AgentFramework.Core.Data
             e.HasIndex(x => x.ThreadId)
              .HasDatabaseName("ix_agent_messages_thread_id");
 
+            e.HasIndex(x => x.AgentId)
+             .HasDatabaseName("ix_agent_messages_agent_id");
+
             // Required text columns
             e.Property(x => x.MessageText)
              .IsRequired()
