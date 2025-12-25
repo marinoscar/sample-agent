@@ -19,14 +19,16 @@ namespace AgentFramework.Core.Agents
             DefaultIgnoreCondition = JsonIgnoreCondition.Never
         };
 
-        public static AgentMessage ToAgentMessage(this ChatMessage chatMessage, string threadId)
+        public static AgentMessage ToAgentMessage(this ChatMessage chatMessage, AgentChatMetadata agentInfo)
         {
             if (chatMessage is null) throw new ArgumentNullException(nameof(chatMessage));
-            if (string.IsNullOrWhiteSpace(threadId)) throw new ArgumentException("ThreadId is required.", nameof(threadId));
+            if (agentInfo is null) throw new ArgumentNullException(nameof(agentInfo));
 
             return new AgentMessage
             {
-                ThreadId = threadId,
+                ThreadId = agentInfo.ThreadId,
+                AgentId = agentInfo.AgentId,
+                AgentName = agentInfo.AgentName,
                 MessageText = chatMessage.Text ?? string.Empty,
                 SerializedMessage = JsonSerializer.Serialize(chatMessage, JsonOptions),
                 UtcCreatedAt = chatMessage.CreatedAt.HasValue ? chatMessage.CreatedAt.Value.UtcDateTime : DateTime.UtcNow
