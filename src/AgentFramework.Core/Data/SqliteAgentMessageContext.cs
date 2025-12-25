@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Data
 {
-    public sealed class SqliteAgentMessageContext : AgentMessageContextBase
+    public sealed class SqliteAgentMessageContext : AgentStoreContextBase
     {
         public SqliteAgentMessageContext(string connectionString)
             : base(new DbContextOptionsBuilder<SqliteAgentMessageContext>()

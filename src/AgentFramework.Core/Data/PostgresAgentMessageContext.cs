@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Data
 {
-    public sealed class PostgresAgentMessageContext : AgentMessageContextBase
+    public sealed class PostgresAgentMessageContext : AgentStoreContextBase
     {
         public PostgresAgentMessageContext(string connectionString)
             : base(new DbContextOptionsBuilder<PostgresAgentMessageContext>()

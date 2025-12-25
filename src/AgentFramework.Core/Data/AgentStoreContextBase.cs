@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Data
 {
-    public abstract class AgentMessageContextBase : DbContext, IAgentMessageContext
+    public abstract class AgentStoreContextBase : DbContext, IAgentMessageContext
     {
-        protected AgentMessageContextBase(DbContextOptions options) : base(options) { }
+        protected AgentStoreContextBase(DbContextOptions options) : base(options) { }
 
         public DbSet<AgentMessage> AgentMessages => Set<AgentMessage>();
 
