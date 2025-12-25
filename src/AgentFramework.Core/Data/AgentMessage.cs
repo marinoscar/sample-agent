@@ -9,7 +9,10 @@ namespace AgentFramework.Core.Data
     public class AgentMessage
     {
         public long Id { get; set; }  
+
+        public string AgentId { get; set; } = default!;
         public string ThreadId { get; set; } = default!;
+        public string AgentName { get; set; } = default!;
         public string MessageText { get; set; } = default!;
         public string SerializedMessage { get; set; } = default!;
         public DateTime UtcCreatedAt { get; set; }
