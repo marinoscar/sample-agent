@@ -62,6 +62,12 @@ namespace AgentFramework.Core.Data
              .IsRequired();
         }
 
+        public virtual async Task EnsureDatabaseAndTablesCreatedAsync(CancellationToken ct = default)
+        {
+            // Creates the database (if needed) and all tables for the current model (if needed).
+            await Database.EnsureCreatedAsync(ct);
+        }
+
         // Provider-specific unbounded text type
         protected abstract string UnboundedTextType { get; }
     }
