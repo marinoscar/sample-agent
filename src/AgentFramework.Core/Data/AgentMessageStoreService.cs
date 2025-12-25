@@ -17,26 +17,23 @@ namespace AgentFramework.Core.Data
         }
 
         public async Task<IReadOnlyList<AgentMessage>> GetByThreadIdAsync(
-            string threadId,
+            AgentChatMetadata agentInfo,
             CancellationToken ct = default)
         {
-            if (string.IsNullOrWhiteSpace(threadId))
-                throw new ArgumentException("ThreadId is required.", nameof(threadId));
-
+            ValidateAgentInfo(agentInfo);
             return await _db.AgentMessages
                 .AsNoTracking()
-                .Where(m => m.ThreadId == threadId)
+                .Where(m => m.AgentId == agentInfo.AgentId && m.ThreadId == agentInfo.ThreadId)
                 .OrderBy(m => m.UtcCreatedAt)
                 .ToListAsync(ct);
         }
 
         public async Task AddRangeAsync(
-            string threadId,
+            AgentChatMetadata agentInfo,
             IEnumerable<AgentMessage> messages,
             CancellationToken ct = default)
         {
-            if (string.IsNullOrWhiteSpace(threadId))
-                throw new ArgumentException("ThreadId is required.", nameof(threadId));
+            ValidateAgentInfo(agentInfo);
             if (messages is null)
                 throw new ArgumentNullException(nameof(messages));
 
@@ -49,7 +46,9 @@ namespace AgentFramework.Core.Data
             {
                 if (m is null) continue;
 
-                m.ThreadId = threadId;
+                m.ThreadId = agentInfo.ThreadId;
+                m.AgentId = agentInfo.AgentId;
+                m.AgentName = agentInfo.AgentName;
 
                 if (string.IsNullOrWhiteSpace(m.MessageText))
                     throw new ArgumentException("MessageText is required.", nameof(messages));
@@ -63,6 +62,16 @@ namespace AgentFramework.Core.Data
 
             await _db.AgentMessages.AddRangeAsync(list, ct);
             await _db.SaveChangesAsync(ct);
+        }
+
+        protected virtual void ValidateAgentInfo(AgentChatMetadata agentInfo)
+        {
+            if (agentInfo is null)
+                throw new ArgumentNullException(nameof(agentInfo));
+            if (string.IsNullOrWhiteSpace(agentInfo.AgentId))
+                throw new ArgumentException("AgentId is required.", nameof(agentInfo));
+            if (string.IsNullOrWhiteSpace(agentInfo.ThreadId))
+                throw new ArgumentException("ThreadId is required.", nameof(agentInfo));
         }
     }
 }

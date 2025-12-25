@@ -9,11 +9,11 @@ namespace AgentFramework.Core.Data
     public interface IAgentMessageStore
     {
         Task<IReadOnlyList<AgentMessage>> GetByThreadIdAsync(
-            string threadId,
+            AgentChatMetadata agentInfo,
             CancellationToken ct = default);
 
         Task AddRangeAsync(
-            string threadId,
+            AgentChatMetadata agentInfo,
             IEnumerable<AgentMessage> messages,
             CancellationToken ct = default);
     }

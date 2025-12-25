@@ -15,7 +15,7 @@ namespace AgentFramework.Core.Data
 
         private readonly IAgentMessageStore _agentMessageStore;
 
-        public string ThreadId { get; set; } = default!;
+        public AgentChatMetadata AgentInfo { get; set; } = default!;
 
         public SqlChatMessageStore(IAgentMessageStore agentMessageStore)
         {
