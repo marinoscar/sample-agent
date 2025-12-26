@@ -50,7 +50,7 @@ namespace AgentFramework.Core.Data
                     ReferenceHandler = ReferenceHandler.IgnoreCycles,
                 };
             }
-            return JsonSerializer.SerializeToElement(AgentInfo, jsonSerializerOptions);
+            return JsonSerializer.SerializeToElement(AgentInfo.ThreadId, jsonSerializerOptions);
         }
 
         private void EnsureStoreIsReady()
