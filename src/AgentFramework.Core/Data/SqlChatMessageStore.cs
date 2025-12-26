@@ -14,11 +14,14 @@ namespace AgentFramework.Core.Data
     public class SqlChatMessageStore : AgentChatMessageStore
     {
 
+        private readonly Func<IAgentMessageStore> _agentMessageStoreFactory;
         private readonly IAgentMessageStore _agentMessageStore;
 
-        public SqlChatMessageStore(IAgentMessageStore agentMessageStore)
+        public SqlChatMessageStore(Func<IAgentMessageStore> agentMessageStoreFactory, string agentId, string agentName, JsonElement serializedStoreState, JsonSerializerOptions? jsonSerializerOptions = null) 
+            : base(agentId, agentName, serializedStoreState, jsonSerializerOptions)
         {
-            _agentMessageStore = agentMessageStore ?? throw new ArgumentNullException(nameof(agentMessageStore));
+            _agentMessageStoreFactory = agentMessageStoreFactory ?? throw new ArgumentNullException(nameof(agentMessageStoreFactory));
+            _agentMessageStore = _agentMessageStoreFactory();
             EnsureStoreIsReady();
         }
 

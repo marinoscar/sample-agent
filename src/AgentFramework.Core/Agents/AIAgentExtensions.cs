@@ -10,6 +10,9 @@ namespace AgentFramework.Core.Agents
 {
     public static class AIAgentExtensions
     {
+
+        private static Dictionary<AgentThread, string> _threadKeys = new Dictionary<AgentThread, string>();
+
         public static async Task StreamResponseAsync(
                                     this AIAgent agent,
                                     string prompt,

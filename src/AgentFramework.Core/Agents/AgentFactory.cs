@@ -1,5 +1,6 @@
 ﻿using AgentFramework.Core.Configuration;
 using AgentFramework.Core.Data;
+using AgentFramework.Core.Middleware;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
@@ -19,22 +20,24 @@ namespace AgentFramework.Core.Agents
     {
 
         private readonly ILoggerFactory? _logger;
-        private readonly Func<AgentChatMessageStore> _chatMessageStoreFactory;
+        private readonly Func<IAgentMessageStore> _agentMessageStoreFactory;
         private static bool hasStoreBeenInitialized = false;
 
-        public AgentFactory(Func<AgentChatMessageStore>? chatMessageStoreFactory = null, ILoggerFactory? loggerFactory = null)
+        public AgentFactory(Func<IAgentMessageStore>? agentMessageStoreFactory = null, ILoggerFactory? loggerFactory = null)
         {
             _logger = loggerFactory;
-            _chatMessageStoreFactory = chatMessageStoreFactory ?? GetStoreFactory();
+            _agentMessageStoreFactory = agentMessageStoreFactory ?? throw new ArgumentNullException(nameof(agentMessageStoreFactory));
         }
 
         public async Task EnsureStoreIsReadyAsync(CancellationToken ct = default)
         {
             if(hasStoreBeenInitialized) return;
-            var store = _chatMessageStoreFactory();
+            var store = _agentMessageStoreFactory();
+            await store.EnsureStoreIsReadyAsync(ct);
+            hasStoreBeenInitialized = true;
         }
 
-        public ChatClientAgent CreateAgent(AgentConfiguration agentSettings)
+        public AIAgent CreateAgent(AgentConfiguration agentSettings)
         {
             return agentSettings.Provider?.ToLowerInvariant().Trim() switch
             {
@@ -46,10 +49,10 @@ namespace AgentFramework.Core.Agents
             };
         }
 
-        public ChatClientAgent CreateOpenAIAgent(AgentConfiguration agentSettings)
+        public AIAgent CreateOpenAIAgent(AgentConfiguration agentSettings)
         {
             var responsesClient = CreateOpenAIResponsesClient(agentSettings);
-            var agent = responsesClient.CreateAIAgent(options: new ChatClientAgentOptions()
+            var innerAgent = responsesClient.CreateAIAgent(options: new ChatClientAgentOptions()
             {
                 Id = agentSettings.Id,
                 Name = agentSettings.Name,
@@ -68,21 +71,24 @@ namespace AgentFramework.Core.Agents
                 },
                 ChatMessageStoreFactory = GetStore(agentSettings),
             }, loggerFactory: _logger);
-            //agent.AsBuilder().Use()
+            var agent = innerAgent.AsBuilder()
+                          .Use(InspectMiddleware.FunctionCallingMiddleware)
+                          .Use(InspectMiddleware.RunInspectionAsync, InspectMiddleware.RunStreamingInspectionAsync)
+                          .Build();
             return agent;
         }
 
-        public ChatClientAgent CreateAzureOpenAIAgent(AgentConfiguration agentSettings)
+        public AIAgent CreateAzureOpenAIAgent(AgentConfiguration agentSettings)
         {
             throw new NotImplementedException();
         }
 
-        public ChatClientAgent CreateAnthropicAIAgent(AgentConfiguration agentSettings)
+        public AIAgent CreateAnthropicAIAgent(AgentConfiguration agentSettings)
         {
             throw new NotImplementedException();
         }
 
-        public ChatClientAgent CreateGeminiAIAgent(AgentConfiguration agentSettings)
+        public AIAgent CreateGeminiAIAgent(AgentConfiguration agentSettings)
         {
             throw new NotImplementedException();
         }
@@ -104,7 +110,7 @@ namespace AgentFramework.Core.Agents
             }
             return (context) =>
             {
-                var store = _chatMessageStoreFactory!();
+                var store = _agentMessageStoreFactory!();
                 
                 // Extract thread ID from serialized state or generate new one
                 var threadId = context.SerializedState.ValueKind is JsonValueKind.String
