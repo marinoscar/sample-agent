@@ -62,6 +62,9 @@ namespace AgentFramework.Core.Agents
                     ResponseFormat = agentSettings.GetResponseFormat(),
                     ToolMode = agentSettings.GetToolMode(),
                     Tools = new AgentToolFactory().GetTools(agentSettings.ToolList),
+                    //Using this line to fix the issue described here
+                    //https://github.com/microsoft/agent-framework/issues/2912#issuecomment-3679548491
+                    RawRepresentationFactory = _ => new CreateResponseOptions() { StoredOutputEnabled = false },
                 },
                 ChatMessageStoreFactory = GetStore(agentSettings),
             }, loggerFactory: _logger);
