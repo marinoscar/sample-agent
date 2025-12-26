@@ -20,6 +20,10 @@ namespace AgentFramework.Core.Configuration
         public string Id { get { return Settings.ContainsKey(nameof(Id)) ? Settings[nameof(Id)] : string.Empty; } set { Settings[nameof(Id)] = value; } }
         public string ToolMode { get { return Settings.ContainsKey(nameof(ToolMode)) ? Settings[nameof(ToolMode)] : string.Empty; } set { Settings[nameof(ToolMode)] = value; } }
 
+        public string ResponseFormat { get { return Settings.ContainsKey(nameof(ResponseFormat)) ? Settings[nameof(ResponseFormat)] : string.Empty; } set { Settings[nameof(ResponseFormat)] = value; } }
+
+        public string ToolList { get { return Settings.ContainsKey(nameof(ToolList)) ? Settings[nameof(ToolList)] : string.Empty; } set { Settings[nameof(ToolList)] = value; } }
+
         public AgentSettings()
         {
             Id = Guid.NewGuid().ToString("N");
@@ -27,6 +31,7 @@ namespace AgentFramework.Core.Configuration
             Temperature = 0.7d;
             Model = "gpt-5-nano";
             Name = "Default Agent";
+            ResponseFormat = ChatResponseFormat.Text.GetType().Name;
             ToolMode = ChatToolMode.Auto.GetType().Name;
         }
 
@@ -42,6 +47,21 @@ namespace AgentFramework.Core.Configuration
                 nameof(ChatToolMode.Auto) => ChatToolMode.Auto,
                 nameof(ChatToolMode.RequireAny) => ChatToolMode.RequireAny,
                 _ => ChatToolMode.Auto
+            };
+        }
+
+        public ChatResponseFormat GetResponseFormat()
+        {
+            if (string.IsNullOrEmpty(ResponseFormat))
+            {
+                return ChatResponseFormat.Text;
+            }
+
+            return ResponseFormat switch
+            {
+                nameof(ChatResponseFormat.Text) => ChatResponseFormat.Text,
+                nameof(ChatResponseFormat.Json) => ChatResponseFormat.Json,
+                _ => ChatResponseFormat.Text
             };
         }
     }
