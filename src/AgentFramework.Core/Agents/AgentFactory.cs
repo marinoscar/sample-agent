@@ -97,6 +97,10 @@ namespace AgentFramework.Core.Agents
 
         private Func<ChatMessageStoreFactoryContext, ChatMessageStore> GetStore(AgentConfiguration agentSettings)
         {
+            if (!agentSettings.PersistConversation)
+            {
+                return _ => new InMemoryChatMessageStore();
+            }
             return (context) =>
             {
                 var store = _chatMessageStoreFactory!();

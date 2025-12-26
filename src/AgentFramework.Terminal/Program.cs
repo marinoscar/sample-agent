@@ -24,6 +24,7 @@ namespace AgentFramework.Terminal
         /// </summary>
         private static ILogger _logger;
 
+
         /// <summary>
         /// Main entry point for the application.
         /// Initializes services, logging, parses arguments, and executes the main action.
@@ -68,19 +69,24 @@ namespace AgentFramework.Terminal
         /// <param name="arguments">Parsed command-line options.</param>
         static void RunConsole(ConsoleOptions arguments)
         {
-            Console.WriteLine("How can I help you?");
+            var openAiAgent = new AgentFactory().CreateOpenAIAgent(new AgentConfiguration
+            {
+                Instructions = "You are a helpful AI assistant."
+            });
+
+            var thread = openAiAgent.GetNewThread();
+
+            WriteConsole("How can I help you?");
             while (true)
             {
+                Console.WriteLine();
                 var prompt = Console.ReadLine();
+                Console.WriteLine();
                 if (string.IsNullOrEmpty(prompt) || prompt.ToLowerInvariant() == "end")
                     return;
 
                 var orignal = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Green;
-                var openAiAgent = new AgentFactory().CreateOpenAIAgent(new AgentConfiguration
-                {
-                    Instructions = "You are a helpful AI assistant."
-                });
 
                 openAiAgent.StreamResponse(prompt, (update) =>
                 {
@@ -88,16 +94,45 @@ namespace AgentFramework.Terminal
                     {
                         Console.Write(update.Text);
                     }
-                });
+                }, thread);
 
                 Console.ForegroundColor = orignal;
                 Console.WriteLine();
-                Console.WriteLine("Anything else I can help you with?");
+                WriteConsole("Anything else I can help you with?");
+
             }
         }
 
 
         #region Console Methods
+
+        private static void WriteConsole(string format, params object[] arg)
+        {
+            var or = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine();
+            Console.WriteLine(format, arg);
+            Console.WriteLine();
+            Console.ForegroundColor = or;
+        }
+
+        private static void WriteAssistant(string format, params object[] arg)
+        {
+            var or = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(format, arg);
+            Console.ForegroundColor = or;
+        }
+
+        private static void WriteUser(string format, params object[] arg)
+        {
+            var or = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine();
+            Console.WriteLine(format, arg);
+            Console.WriteLine();
+            Console.ForegroundColor = or;
+        }
 
         /// <summary>
         /// Logs an informational message with formatting.

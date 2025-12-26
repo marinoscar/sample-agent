@@ -17,6 +17,8 @@ namespace AgentFramework.Core.Configuration
         public string Instructions { get; set; }
         public string ToolMode { get; set; }
         public float? Temperature { get; set; }
+
+        public bool PersistConversation { get; set; } = false;
         public string ResponseFormat { get; set; }
         public string ToolList { get; set; }
         public string? AdditinonalSettings { get; set; }
