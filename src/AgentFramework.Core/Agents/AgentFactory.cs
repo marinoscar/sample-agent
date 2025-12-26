@@ -99,7 +99,8 @@ namespace AgentFramework.Core.Agents
         {
             if (!agentSettings.PersistConversation)
             {
-                return _ => new InMemoryChatMessageStore();
+                return (c) => 
+                    new InMemoryChatMessageStore(c.SerializedState, c.JsonSerializerOptions);
             }
             return (context) =>
             {
