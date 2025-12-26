@@ -11,14 +11,14 @@ namespace AgentFramework.Core.Agents
 {
     public class AgentToolFactory
     {
-        public IEnumerable<AITool> GetTools(string toolIdsCSV)
+        public List<AITool> GetTools(string toolIdsCSV)
         {
             if (string.IsNullOrEmpty(toolIdsCSV)) return default!;
             var toolIds = toolIdsCSV.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             return GetTools(toolIds);
         }
 
-        public IEnumerable<AITool> GetTools(IEnumerable<string> toolIds)
+        public List<AITool> GetTools(IEnumerable<string> toolIds)
         {
             if (toolIds == null || !toolIds.Any()) return default!;
 
