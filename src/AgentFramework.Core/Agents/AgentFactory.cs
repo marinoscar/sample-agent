@@ -1,6 +1,8 @@
 ﻿using AgentFramework.Core.Configuration;
+using AgentFramework.Core.Data;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Logging;
 using OpenAI;
 using OpenAI.Responses;
 using System;
@@ -11,17 +13,26 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Agents
 {
-    public static class AgentFactory
+    public class AgentFactory
     {
 
-        public static ResponsesClient CreateOpenAIResponsesClient()
+        private readonly ILoggerFactory? _logger;
+        private readonly ChatMessageStore? _chatMessageStore;
+
+        public AgentFactory(ChatMessageStore? chatMessageStore, ILoggerFactory? loggerFactory = null)
+        {
+            _logger = loggerFactory;
+            _chatMessageStore = chatMessageStore ?? new SqlChatMessageStore(new AgentMessageStoreService(() => new SqliteAgentMessageContext()));
+        }
+
+        public ResponsesClient CreateOpenAIResponsesClient()
         {
             var client = new OpenAIClient("KEY");
             var responses =  client.GetResponsesClient("MODEL");
             return responses;
         }
 
-        public static AIAgent CreateOpenAIAgent(AgentSettings agentSettings)
+        public AIAgent CreateOpenAIAgent(AgentSettings agentSettings)
         {
             var responsesClient = CreateOpenAIResponsesClient();
             var agent = responsesClient.CreateAIAgent(options: new ChatClientAgentOptions()
@@ -35,10 +46,14 @@ namespace AgentFramework.Core.Agents
                     ModelId = agentSettings.Model,
                     Temperature = (float)(agentSettings.Temperature),
                     ResponseFormat = agentSettings.GetResponseFormat(),
+                    ToolMode = agentSettings.GetToolMode(),
+                    Tools = new AgentToolFactory().GetTools(agentSettings.ToolList),
                 },
-                Temperature = agentSettings.Temperature,
-                ToolMode = agentSettings.GetToolMode()
-            });
+                ChatMessageStoreFactory = (context) =>
+                {
+                    return _chatMessageStore!;
+                }
+            }, loggerFactory: _logger);
             return agent;
         }
     }
