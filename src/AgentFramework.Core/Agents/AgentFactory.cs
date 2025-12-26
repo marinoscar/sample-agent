@@ -25,16 +25,21 @@ namespace AgentFramework.Core.Agents
             _chatMessageStore = chatMessageStore ?? new SqlChatMessageStore(new AgentMessageStoreService(() => new SqliteAgentMessageContext()));
         }
 
-        public ResponsesClient CreateOpenAIResponsesClient()
+        public AIAgent CreateAgent(AgentConfiguration agentSettings)
         {
-            var client = new OpenAIClient("KEY");
-            var responses =  client.GetResponsesClient("MODEL");
-            return responses;
+            return agentSettings.Provider?.ToLowerInvariant().Trim() switch
+            {
+                "openai" => CreateOpenAIAgent(agentSettings),
+                "azureopenai" => CreateAzureOpenAIAgent(agentSettings),
+                "anthropic" => CreateAnthropicAIAgent(agentSettings),
+                "gemini" => CreateGeminiAIAgent(agentSettings),
+                _ => throw new NotSupportedException($"The provider '{agentSettings.Provider}' is not supported."),
+            };
         }
 
         public AIAgent CreateOpenAIAgent(AgentConfiguration agentSettings)
         {
-            var responsesClient = CreateOpenAIResponsesClient();
+            var responsesClient = CreateOpenAIResponsesClient(agentSettings);
             var agent = responsesClient.CreateAIAgent(options: new ChatClientAgentOptions()
             {
                 Id = agentSettings.Id,
@@ -56,5 +61,29 @@ namespace AgentFramework.Core.Agents
             }, loggerFactory: _logger);
             return agent;
         }
+
+        public AIAgent CreateAzureOpenAIAgent(AgentConfiguration agentSettings)
+        {
+            throw new NotImplementedException();
+        }
+
+        public AIAgent CreateAnthropicAIAgent(AgentConfiguration agentSettings)
+        {
+            throw new NotImplementedException();
+        }
+
+        public AIAgent CreateGeminiAIAgent(AgentConfiguration agentSettings)
+        {
+            throw new NotImplementedException();
+        }
+
+        private ResponsesClient CreateOpenAIResponsesClient(AgentConfiguration agentSettings)
+        {
+            var key = new CredentialFactory().GetFromProvider(agentSettings.Provider);
+            var client = new OpenAIClient(key.ApiKey);
+            var responses = client.GetResponsesClient(agentSettings.Model);
+            return responses;
+        }
+
     }
 }
