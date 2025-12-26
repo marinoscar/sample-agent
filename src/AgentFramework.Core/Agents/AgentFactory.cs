@@ -19,7 +19,7 @@ namespace AgentFramework.Core.Agents
         private readonly ILoggerFactory? _logger;
         private readonly ChatMessageStore? _chatMessageStore;
 
-        public AgentFactory(ChatMessageStore? chatMessageStore, ILoggerFactory? loggerFactory = null)
+        public AgentFactory(ChatMessageStore? chatMessageStore = null, ILoggerFactory? loggerFactory = null)
         {
             _logger = loggerFactory;
             _chatMessageStore = chatMessageStore ?? new SqlChatMessageStore(new AgentMessageStoreService(() => new SqliteAgentMessageContext()));
