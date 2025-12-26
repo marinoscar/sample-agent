@@ -16,7 +16,7 @@ namespace AgentFramework.Core.Configuration
         public string Model { get; set; }
         public string Instructions { get; set; }
         public string ToolMode { get; set; }
-        public double Temperature { get; set; }
+        public float? Temperature { get; set; }
         public string ResponseFormat { get; set; }
         public string ToolList { get; set; }
         public string? AdditinonalSettings { get; set; }
@@ -25,7 +25,7 @@ namespace AgentFramework.Core.Configuration
         {
             Id = Guid.NewGuid().ToString("N");
             Instructions = "You are a helpful AI assistant.";
-            Temperature = 0.7d;
+            Temperature = null; // not supported by models gpt-5-nano and gpt-5-mini
             Model = "gpt-5-nano";
             Name = "Default Agent";
             ResponseFormat = ChatResponseFormat.Text.GetType().Name;

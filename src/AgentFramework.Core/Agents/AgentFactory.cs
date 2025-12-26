@@ -58,7 +58,7 @@ namespace AgentFramework.Core.Agents
                 {
                     Instructions = agentSettings.Instructions,
                     ModelId = agentSettings.Model,
-                    Temperature = (float)(agentSettings.Temperature),
+                    Temperature = agentSettings.Temperature,
                     ResponseFormat = agentSettings.GetResponseFormat(),
                     ToolMode = agentSettings.GetToolMode(),
                     Tools = new AgentToolFactory().GetTools(agentSettings.ToolList),
