@@ -11,9 +11,9 @@ namespace AgentFramework.Core.Data
     {
         private readonly IAgentMessageContext _db;
 
-        public AgentMessageStoreService(IAgentMessageContext db)
+        public AgentMessageStoreService(Func<IAgentMessageContext> createContext)
         {
-            _db = db ?? throw new ArgumentNullException(nameof(db));
+            _db = createContext ?? throw new ArgumentNullException(nameof(createContext));
         }
 
         public async Task<IReadOnlyList<AgentMessage>> GetByThreadIdAsync(
