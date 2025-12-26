@@ -110,30 +110,8 @@ namespace AgentFramework.Core.Agents
             }
             return (context) =>
             {
-                var store = _agentMessageStoreFactory!();
-                
-                // Extract thread ID from serialized state or generate new one
-                var threadId = context.SerializedState.ValueKind is JsonValueKind.String
-                    ? context.SerializedState.Deserialize<string>() ?? Guid.NewGuid().ToString("N")
-                    : Guid.NewGuid().ToString("N");
-
-                store.AgentInfo = new AgentChatMetadata
-                {
-                    AgentId = agentSettings.Id!,
-                    AgentName = agentSettings.Name!,
-                    ThreadId = threadId,
-                };
-                
-                return store;
+                return new SqlChatMessageStore(_agentMessageStoreFactory, agentSettings.Id, agentSettings.Name,context.SerializedState, context.JsonSerializerOptions);
             };
         }
-
-        private static Func<AgentChatMessageStore> GetStoreFactory() {
-
-            return () =>
-            new SqlChatMessageStore(new AgentMessageStoreService(() => new SqliteAgentMessageContext()));
-
-         }
-
     }
 }
