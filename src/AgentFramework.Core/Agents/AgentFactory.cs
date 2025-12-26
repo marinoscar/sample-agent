@@ -1,4 +1,6 @@
-﻿using Microsoft.Agents.AI;
+﻿using AgentFramework.Core.Configuration;
+using Microsoft.Agents.AI;
+using Microsoft.Extensions.AI;
 using OpenAI;
 using OpenAI.Responses;
 using System;
@@ -19,10 +21,24 @@ namespace AgentFramework.Core.Agents
             return responses;
         }
 
-        public static AIAgent CreateOpenAIAgent(string instructions)
+        public static AIAgent CreateOpenAIAgent(AgentSettings agentSettings)
         {
             var responsesClient = CreateOpenAIResponsesClient();
-            var agent = responsesClient.CreateAIAgent(instructions);
+            var agent = responsesClient.CreateAIAgent(options: new ChatClientAgentOptions()
+            {
+                Id = agentSettings.Id,
+                Name = agentSettings.Name,
+                Description = agentSettings.Description,
+                ChatOptions = new ChatOptions()
+                {
+                    Instructions = agentSettings.Instructions,
+                    ModelId = agentSettings.Model,
+                    Temperature = (float)(agentSettings.Temperature),
+                    ResponseFormat = agentSettings.GetResponseFormat(),
+                },
+                Temperature = agentSettings.Temperature,
+                ToolMode = agentSettings.GetToolMode()
+            });
             return agent;
         }
     }
