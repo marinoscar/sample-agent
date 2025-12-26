@@ -31,7 +31,7 @@ namespace AgentFramework.Core.Configuration
             ResponseFormat = ChatResponseFormat.Text.GetType().Name;
             ToolMode = ChatToolMode.Auto.GetType().Name;
             Description = string.Empty;
-            ToolList = string.Empty;
+            ToolList = "web_search,code_interpreter,datetime";
             Provider = "OpenAI";
         }
 
