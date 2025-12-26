@@ -74,7 +74,7 @@ namespace AgentFramework.Terminal
                 Instructions = "You are a helpful AI assistant."
             });
 
-            var thread = openAiAgent.GetNewThread();
+            var thread = openAiAgent.GetNewThread(Guid.NewGuid().ToString("N"));
 
             WriteConsole("How can I help you?");
             while (true)
