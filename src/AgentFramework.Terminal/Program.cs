@@ -74,13 +74,11 @@ namespace AgentFramework.Terminal
 
                 var orignal = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Green;
-                var openAiAgent = new OpenAIAgent(OpenAISettings.Create("You are a web research agent and will look online for the responses"));
-                openAiAgent.Stream(prompt, (update) =>
+                var openAiAgent = new AgentFactory().CreateOpenAIAgent(new AgentConfiguration
                 {
-                    if (update == null)
-                        return;
-                    Console.Write(update.Text);
+                    Instructions = "You are a helpful AI assistant."
                 });
+
                 Console.ForegroundColor = orignal;
                 Console.WriteLine();
                 Console.WriteLine();
