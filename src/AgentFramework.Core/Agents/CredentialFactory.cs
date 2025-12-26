@@ -24,7 +24,7 @@ namespace AgentFramework.Core.Agents
 
         public AgentCredential GetForOpenAI()
         {
-            var key = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+            var key = Env.GetOptional("OPENAI_API_KEY");
             if (string.IsNullOrEmpty(key))
             {
                 throw new InvalidOperationException("OPENAI_API_KEY environment variable is required");
@@ -38,9 +38,9 @@ namespace AgentFramework.Core.Agents
 
         public AgentCredential GetForAzureOpenAI()
         {
-            var key = Environment.GetEnvironmentVariable("AZURE_OPENAI_KEY");
-            var endpoint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT");
-            var deploymentName = Environment.GetEnvironmentVariable("AZURE_OPENAI_DEPLOYMENT_NAME");
+            var key = Env.GetOptional("AZURE_OPENAI_KEY");
+            var endpoint = Env.GetOptional("AZURE_OPENAI_ENDPOINT");
+            var deploymentName = Env.GetOptional("AZURE_OPENAI_DEPLOYMENT_NAME");
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(deploymentName))
             {
                 throw new InvalidOperationException("AZURE_OPENAI_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT_NAME environment variables are required");
@@ -58,7 +58,7 @@ namespace AgentFramework.Core.Agents
 
         public AgentCredential GetForAnthropic()
         {
-            var key = Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY");
+            var key = Env.GetOptional("ANTHROPIC_API_KEY");
             if (string.IsNullOrEmpty(key))
             {
                 throw new InvalidOperationException("ANTHROPIC_API_KEY environment variable is required");
@@ -72,7 +72,7 @@ namespace AgentFramework.Core.Agents
 
         public AgentCredential GetForGemini()
         {
-            var key = Environment.GetEnvironmentVariable("GOOGLE_GEMINI_API_KEY");
+            var key = Env.GetOptional("GOOGLE_GEMINI_API_KEY");
             if (string.IsNullOrEmpty(key))
             {
                 throw new InvalidOperationException("GOOGLE_GEMINI_API_KEY environment variable is required");
