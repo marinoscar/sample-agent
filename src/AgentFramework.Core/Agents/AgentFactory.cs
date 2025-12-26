@@ -9,7 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using static Microsoft.Agents.AI.ChatClientAgentOptions;
 
 namespace AgentFramework.Core.Agents
 {
@@ -17,12 +19,12 @@ namespace AgentFramework.Core.Agents
     {
 
         private readonly ILoggerFactory? _logger;
-        private readonly ChatMessageStore? _chatMessageStore;
+        private readonly Func<AgentChatMessageStore>? _chatMessageStoreFactory;
 
-        public AgentFactory(ChatMessageStore? chatMessageStore = null, ILoggerFactory? loggerFactory = null)
+        public AgentFactory(Func<AgentChatMessageStore>? chatMessageStoreFactory = null, ILoggerFactory? loggerFactory = null)
         {
             _logger = loggerFactory;
-            _chatMessageStore = chatMessageStore ?? new SqlChatMessageStore(new AgentMessageStoreService(() => new SqliteAgentMessageContext()));
+            _chatMessageStoreFactory = chatMessageStoreFactory ?? GetStoreFactory();
         }
 
         public AIAgent CreateAgent(AgentConfiguration agentSettings)
@@ -54,11 +56,9 @@ namespace AgentFramework.Core.Agents
                     ToolMode = agentSettings.GetToolMode(),
                     Tools = new AgentToolFactory().GetTools(agentSettings.ToolList),
                 },
-                ChatMessageStoreFactory = (context) =>
-                {
-                    return _chatMessageStore!;
-                }
+                ChatMessageStoreFactory = GetStore(agentSettings),
             }, loggerFactory: _logger);
+            
             return agent;
         }
 
@@ -84,6 +84,35 @@ namespace AgentFramework.Core.Agents
             var responses = client.GetResponsesClient(agentSettings.Model);
             return responses;
         }
+
+        private Func<ChatMessageStoreFactoryContext, ChatMessageStore> GetStore(AgentConfiguration agentSettings)
+        {
+            return (context) =>
+            {
+                var store = _chatMessageStoreFactory!();
+                
+                // Extract thread ID from serialized state or generate new one
+                var threadId = context.SerializedState.ValueKind is JsonValueKind.String
+                    ? context.SerializedState.Deserialize<string>() ?? Guid.NewGuid().ToString("N")
+                    : Guid.NewGuid().ToString("N");
+
+                store.AgentInfo = new AgentChatMetadata
+                {
+                    AgentId = agentSettings.Id!,
+                    AgentName = agentSettings.Name!,
+                    ThreadId = threadId,
+                };
+                
+                return store;
+            };
+        }
+
+        private static Func<AgentChatMessageStore> GetStoreFactory() {
+
+            return () =>
+            new SqlChatMessageStore(new AgentMessageStoreService(() => new SqliteAgentMessageContext());
+
+         }
 
     }
 }
