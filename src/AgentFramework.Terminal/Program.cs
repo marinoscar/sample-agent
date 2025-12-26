@@ -79,6 +79,14 @@ namespace AgentFramework.Terminal
                     Instructions = "You are a helpful AI assistant."
                 });
 
+                openAiAgent.StreamResponse(prompt, (update) =>
+                {
+                    if (update != null && !string.IsNullOrEmpty(update.Text))
+                    {
+                        Console.Write(update.Text);
+                    }
+                });
+
                 Console.ForegroundColor = orignal;
                 Console.WriteLine();
                 Console.WriteLine();
