@@ -110,7 +110,7 @@ namespace AgentFramework.Core.Agents
         private static Func<AgentChatMessageStore> GetStoreFactory() {
 
             return () =>
-            new SqlChatMessageStore(new AgentMessageStoreService(() => new SqliteAgentMessageContext());
+            new SqlChatMessageStore(new AgentMessageStoreService(() => new SqliteAgentMessageContext()));
 
          }
 
