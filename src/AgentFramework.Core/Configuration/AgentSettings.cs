@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.AI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,5 +18,31 @@ namespace AgentFramework.Core.Configuration
         public string Name { get { return Settings.ContainsKey(nameof(Name)) ? Settings[nameof(Name)] : string.Empty; } set { Settings[nameof(Name)] = value; } }
         public string Description { get { return Settings.ContainsKey(nameof(Description)) ? Settings[nameof(Description)] : string.Empty; } set { Settings[nameof(Description)] = value; } }
         public string Id { get { return Settings.ContainsKey(nameof(Id)) ? Settings[nameof(Id)] : string.Empty; } set { Settings[nameof(Id)] = value; } }
+        public string ToolMode { get { return Settings.ContainsKey(nameof(ToolMode)) ? Settings[nameof(ToolMode)] : string.Empty; } set { Settings[nameof(ToolMode)] = value; } }
+
+        public AgentSettings()
+        {
+            Id = Guid.NewGuid().ToString("N");
+            Instructions = "You are a helpful AI assistant.";
+            Temperature = 0.7d;
+            Model = "gpt-5-nano";
+            Name = "Default Agent";
+            ToolMode = ChatToolMode.Auto.GetType().Name;
+        }
+
+        public ChatToolMode GetToolMode()
+        {
+            if (string.IsNullOrEmpty(ToolMode))
+            {
+                return ChatToolMode.Auto;
+            }
+
+            return ToolMode switch
+            {
+                nameof(ChatToolMode.Auto) => ChatToolMode.Auto,
+                nameof(ChatToolMode.RequireAny) => ChatToolMode.RequireAny,
+                _ => ChatToolMode.Auto
+            };
+        }
     }
 }
