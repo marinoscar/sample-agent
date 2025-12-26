@@ -24,7 +24,7 @@ namespace AgentFramework.Core.Agents
             InitializeAgent(settings);
         }
 
-        protected override void InitializeAgent(AgentSettings settings)
+        protected override void InitializeAgent(AgentConfiguration settings)
         {
             InitializeAgent(OpenAISettings.FromAgentSettings(settings));
         }

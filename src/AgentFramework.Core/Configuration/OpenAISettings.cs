@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Configuration
 {
-    public class OpenAISettings : AgentSettings
+    public class OpenAISettings : AgentConfiguration
     {
         public bool EnableCodeInterpreter { get { return bool.Parse(Settings[nameof(EnableCodeInterpreter)]); } set { Settings[nameof(EnableCodeInterpreter)] = value.ToString(); } }
         public bool EnableWebSearch { get { return bool.Parse(Settings[nameof(EnableWebSearch)]); } set { Settings[nameof(EnableWebSearch)] = value.ToString(); } }
@@ -28,7 +28,7 @@ namespace AgentFramework.Core.Configuration
             };
         }
 
-        public static OpenAISettings FromAgentSettings(AgentSettings settings)
+        public static OpenAISettings FromAgentSettings(AgentConfiguration settings)
         {
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));

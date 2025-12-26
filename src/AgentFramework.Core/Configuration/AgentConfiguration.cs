@@ -7,20 +7,21 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Configuration
 {
-    public class AgentSettings
+    public class AgentConfiguration
     {
-        public string ApiKey { get; set; }
-        public string Model { get; set; }
-        public string Instructions { get; set; }
-        public double Temperature { get; set; }
+        public string Id { get; set; }
+        public string Provider { get; set; } // e.g., "OpenAI", "AzureOpenAI", "Anthropic"
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Id { get; set; }
+        public string Model { get; set; }
+        public string Instructions { get; set; }
         public string ToolMode { get; set; }
+        public double Temperature { get; set; }
         public string ResponseFormat { get; set; }
         public string ToolList { get; set; }
+        public string? AdditinonalSettings { get; set; }
 
-        public AgentSettings()
+        public AgentConfiguration()
         {
             Id = Guid.NewGuid().ToString("N");
             Instructions = "You are a helpful AI assistant.";

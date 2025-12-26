@@ -32,7 +32,7 @@ namespace AgentFramework.Core.Agents
             return responses;
         }
 
-        public AIAgent CreateOpenAIAgent(AgentSettings agentSettings)
+        public AIAgent CreateOpenAIAgent(AgentConfiguration agentSettings)
         {
             var responsesClient = CreateOpenAIResponsesClient();
             var agent = responsesClient.CreateAIAgent(options: new ChatClientAgentOptions()

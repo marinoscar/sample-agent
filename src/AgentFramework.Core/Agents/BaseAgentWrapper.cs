@@ -12,7 +12,7 @@ namespace AgentFramework.Core.Agents
     public abstract class BaseAgentWrapper
     {
 
-        protected BaseAgentWrapper(AgentSettings settings)
+        protected BaseAgentWrapper(AgentConfiguration settings)
         {
             InitializeAgent(settings);
         }
@@ -32,7 +32,7 @@ namespace AgentFramework.Core.Agents
                 AgentThread = Agent.GetNewThread();
         }
 
-        protected abstract void InitializeAgent(AgentSettings settings);
+        protected abstract void InitializeAgent(AgentConfiguration settings);
 
 
 
