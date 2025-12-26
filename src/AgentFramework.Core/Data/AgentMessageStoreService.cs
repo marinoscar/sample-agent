@@ -13,7 +13,7 @@ namespace AgentFramework.Core.Data
 
         public AgentMessageStoreService(Func<IAgentMessageContext> createContext)
         {
-            _db = createContext ?? throw new ArgumentNullException(nameof(createContext));
+            _db = createContext() ?? throw new ArgumentNullException(nameof(createContext));
         }
 
         public async Task<IReadOnlyList<AgentMessage>> GetByThreadIdAsync(

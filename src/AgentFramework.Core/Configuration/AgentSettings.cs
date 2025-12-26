@@ -9,20 +9,16 @@ namespace AgentFramework.Core.Configuration
 {
     public class AgentSettings
     {
-        public IDictionary<string, string> Settings { get; set; } = new Dictionary<string, string>();
-        public string ApiKey { get { return Settings[nameof(ApiKey)]; } set { Settings[nameof(ApiKey)] = value; } }
-        public string Model { get { return Settings[nameof(Model)]; } set { Settings[nameof(Model)] = value; } }
-        public string Instructions { get { return Settings[nameof(Instructions)]; } set { Settings[nameof(Instructions)] = value; } }
-        public double Temperature { get { return double.Parse(Settings[nameof(Temperature)]); } set { Settings[nameof(Temperature)] = value.ToString(); } }
-
-        public string Name { get { return Settings.ContainsKey(nameof(Name)) ? Settings[nameof(Name)] : string.Empty; } set { Settings[nameof(Name)] = value; } }
-        public string Description { get { return Settings.ContainsKey(nameof(Description)) ? Settings[nameof(Description)] : string.Empty; } set { Settings[nameof(Description)] = value; } }
-        public string Id { get { return Settings.ContainsKey(nameof(Id)) ? Settings[nameof(Id)] : string.Empty; } set { Settings[nameof(Id)] = value; } }
-        public string ToolMode { get { return Settings.ContainsKey(nameof(ToolMode)) ? Settings[nameof(ToolMode)] : string.Empty; } set { Settings[nameof(ToolMode)] = value; } }
-
-        public string ResponseFormat { get { return Settings.ContainsKey(nameof(ResponseFormat)) ? Settings[nameof(ResponseFormat)] : string.Empty; } set { Settings[nameof(ResponseFormat)] = value; } }
-
-        public string ToolList { get { return Settings.ContainsKey(nameof(ToolList)) ? Settings[nameof(ToolList)] : string.Empty; } set { Settings[nameof(ToolList)] = value; } }
+        public string ApiKey { get; set; }
+        public string Model { get; set; }
+        public string Instructions { get; set; }
+        public double Temperature { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Id { get; set; }
+        public string ToolMode { get; set; }
+        public string ResponseFormat { get; set; }
+        public string ToolList { get; set; }
 
         public AgentSettings()
         {
@@ -33,6 +29,9 @@ namespace AgentFramework.Core.Configuration
             Name = "Default Agent";
             ResponseFormat = ChatResponseFormat.Text.GetType().Name;
             ToolMode = ChatToolMode.Auto.GetType().Name;
+            ApiKey = string.Empty;
+            Description = string.Empty;
+            ToolList = string.Empty;
         }
 
         public ChatToolMode GetToolMode()
