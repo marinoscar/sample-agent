@@ -31,6 +31,9 @@ namespace AgentFramework.Terminal
         /// <param name="args">Command-line arguments passed to the application.</param>
         static void Main(string[] args)
         {
+            //Set the consolor color
+            Console.ForegroundColor = ConsoleColor.White;
+
             // Create a HostApplicationBuilder instance.
             // This provides configuration, dependency injection (DI), and logging setup for console apps.
             var builder = Host.CreateApplicationBuilder(args);
@@ -89,7 +92,7 @@ namespace AgentFramework.Terminal
 
                 Console.ForegroundColor = orignal;
                 Console.WriteLine();
-                Console.WriteLine();
+                Console.WriteLine("Anything else I can help you with?");
             }
         }
 
