@@ -11,12 +11,10 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Data
 {
-    public class SqlChatMessageStore : ChatMessageStore
+    public class SqlChatMessageStore : AgentChatMessageStore
     {
 
         private readonly IAgentMessageStore _agentMessageStore;
-
-        public AgentChatMetadata AgentInfo { get; set; } = default!;
 
         public SqlChatMessageStore(IAgentMessageStore agentMessageStore)
         {
