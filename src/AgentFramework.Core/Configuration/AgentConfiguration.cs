@@ -30,9 +30,9 @@ namespace AgentFramework.Core.Configuration
             Name = "Default Agent";
             ResponseFormat = ChatResponseFormat.Text.GetType().Name;
             ToolMode = ChatToolMode.Auto.GetType().Name;
-            ApiKey = string.Empty;
             Description = string.Empty;
             ToolList = string.Empty;
+            Provider = "OpenAI";
         }
 
         public ChatToolMode GetToolMode()
