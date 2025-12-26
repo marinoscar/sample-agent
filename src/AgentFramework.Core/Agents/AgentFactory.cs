@@ -34,7 +34,7 @@ namespace AgentFramework.Core.Agents
             var store = _chatMessageStoreFactory();
         }
 
-        public AIAgent CreateAgent(AgentConfiguration agentSettings)
+        public ChatClientAgent CreateAgent(AgentConfiguration agentSettings)
         {
             return agentSettings.Provider?.ToLowerInvariant().Trim() switch
             {
@@ -46,7 +46,7 @@ namespace AgentFramework.Core.Agents
             };
         }
 
-        public AIAgent CreateOpenAIAgent(AgentConfiguration agentSettings)
+        public ChatClientAgent CreateOpenAIAgent(AgentConfiguration agentSettings)
         {
             var responsesClient = CreateOpenAIResponsesClient(agentSettings);
             var agent = responsesClient.CreateAIAgent(options: new ChatClientAgentOptions()
@@ -68,21 +68,21 @@ namespace AgentFramework.Core.Agents
                 },
                 ChatMessageStoreFactory = GetStore(agentSettings),
             }, loggerFactory: _logger);
-            
+            //agent.AsBuilder().Use()
             return agent;
         }
 
-        public AIAgent CreateAzureOpenAIAgent(AgentConfiguration agentSettings)
+        public ChatClientAgent CreateAzureOpenAIAgent(AgentConfiguration agentSettings)
         {
             throw new NotImplementedException();
         }
 
-        public AIAgent CreateAnthropicAIAgent(AgentConfiguration agentSettings)
+        public ChatClientAgent CreateAnthropicAIAgent(AgentConfiguration agentSettings)
         {
             throw new NotImplementedException();
         }
 
-        public AIAgent CreateGeminiAIAgent(AgentConfiguration agentSettings)
+        public ChatClientAgent CreateGeminiAIAgent(AgentConfiguration agentSettings)
         {
             throw new NotImplementedException();
         }
