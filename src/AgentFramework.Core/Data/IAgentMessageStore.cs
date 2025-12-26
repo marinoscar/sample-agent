@@ -16,5 +16,7 @@ namespace AgentFramework.Core.Data
             AgentChatMetadata agentInfo,
             IEnumerable<AgentMessage> messages,
             CancellationToken ct = default);
+
+        Task EnsureStoreIsReadyAsync(CancellationToken ct = default);
     }
 }

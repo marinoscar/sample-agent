@@ -19,6 +19,7 @@ namespace AgentFramework.Core.Data
         public SqlChatMessageStore(IAgentMessageStore agentMessageStore)
         {
             _agentMessageStore = agentMessageStore ?? throw new ArgumentNullException(nameof(agentMessageStore));
+            EnsureStoreIsReady();
         }
 
         public override async Task AddMessagesAsync(IEnumerable<ChatMessage> messages, CancellationToken cancellationToken = default)
@@ -47,6 +48,11 @@ namespace AgentFramework.Core.Data
                 };
             }
             return JsonSerializer.SerializeToElement(AgentInfo, jsonSerializerOptions);
+        }
+
+        private void EnsureStoreIsReady()
+        {
+            _agentMessageStore.EnsureStoreIsReadyAsync().GetAwaiter().GetResult();
         }
     }
 }

@@ -19,12 +19,19 @@ namespace AgentFramework.Core.Agents
     {
 
         private readonly ILoggerFactory? _logger;
-        private readonly Func<AgentChatMessageStore>? _chatMessageStoreFactory;
+        private readonly Func<AgentChatMessageStore> _chatMessageStoreFactory;
+        private static bool hasStoreBeenInitialized = false;
 
         public AgentFactory(Func<AgentChatMessageStore>? chatMessageStoreFactory = null, ILoggerFactory? loggerFactory = null)
         {
             _logger = loggerFactory;
             _chatMessageStoreFactory = chatMessageStoreFactory ?? GetStoreFactory();
+        }
+
+        public async Task EnsureStoreIsReadyAsync(CancellationToken ct = default)
+        {
+            if(hasStoreBeenInitialized) return;
+            var store = _chatMessageStoreFactory();
         }
 
         public AIAgent CreateAgent(AgentConfiguration agentSettings)

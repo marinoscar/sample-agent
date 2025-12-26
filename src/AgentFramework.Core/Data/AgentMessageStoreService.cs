@@ -10,10 +10,18 @@ namespace AgentFramework.Core.Data
     public class AgentMessageStoreService : IAgentMessageStore
     {
         private readonly IAgentMessageContext _db;
+        private static bool _isInitialized = false;
 
         public AgentMessageStoreService(Func<IAgentMessageContext> createContext)
         {
             _db = createContext() ?? throw new ArgumentNullException(nameof(createContext));
+        }
+
+        public async Task EnsureStoreIsReadyAsync(CancellationToken ct = default)
+        {
+            if(_isInitialized) return;
+            await _db.EnsureDatabaseReadyAsync(ct);
+            _isInitialized = true;
         }
 
         public async Task<IReadOnlyList<AgentMessage>> GetByThreadIdAsync(

@@ -14,7 +14,7 @@ namespace AgentFramework.Core.Data
 
         Task<int> SaveChangesAsync(CancellationToken ct = default);
 
-        Task EnsureDatabaseAndTablesCreatedAsync(CancellationToken ct = default);
+        Task EnsureDatabaseReadyAsync(CancellationToken ct = default);
 
         public DatabaseFacade Database { get; }
     }

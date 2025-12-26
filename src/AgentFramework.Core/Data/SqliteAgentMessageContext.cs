@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,9 @@ namespace AgentFramework.Core.Data
             : base(new DbContextOptionsBuilder<SqliteAgentMessageContext>()
                   .UseSqlite(connectionString)
                   .Options)
-        { }
+        {
+            this.EnsureDatabaseReadyAsync().GetAwaiter().GetResult();
+        }
 
         public SqliteAgentMessageContext() : this(GetConnectionString())
         {
@@ -28,5 +31,11 @@ namespace AgentFramework.Core.Data
         }
 
         protected override string UnboundedTextType => "TEXT";
+
+        public override async Task EnsureDatabaseReadyAsync(CancellationToken ct = default)
+        {
+            await Database.EnsureCreatedAsync(ct);
+        }
+
     }
 }
