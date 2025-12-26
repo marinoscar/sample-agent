@@ -59,7 +59,7 @@ namespace AgentFramework.Core.Data
                 m.AgentName = agentInfo.AgentName;
 
                 if (string.IsNullOrWhiteSpace(m.MessageText))
-                    throw new ArgumentException("MessageText is required.", nameof(messages));
+                    m.MessageText = string.Empty;
 
                 if (string.IsNullOrWhiteSpace(m.SerializedMessage))
                     throw new ArgumentException("SerializedMessage is required.", nameof(messages));
