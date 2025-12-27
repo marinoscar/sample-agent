@@ -26,7 +26,9 @@ namespace AgentFramework.Core.Agents
         public AgentFactory(Func<IAgentMessageStore>? agentMessageStoreFactory = null, ILoggerFactory? loggerFactory = null)
         {
             _logger = loggerFactory;
-            _agentMessageStoreFactory = agentMessageStoreFactory ?? throw new ArgumentNullException(nameof(agentMessageStoreFactory));
+            _agentMessageStoreFactory = agentMessageStoreFactory!;
+
+            _agentMessageStoreFactory ??= (() => new AgentMessageStoreService(() => new SqliteAgentMessageContext()));
         }
 
         public async Task EnsureStoreIsReadyAsync(CancellationToken ct = default)
