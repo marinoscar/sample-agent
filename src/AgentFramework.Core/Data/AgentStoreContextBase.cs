@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AgentFramework.Core.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
@@ -14,10 +15,13 @@ namespace AgentFramework.Core.Data
         protected AgentStoreContextBase(DbContextOptions options) : base(options) { }
 
         public DbSet<AgentMessage> AgentMessages => Set<AgentMessage>();
+        public DbSet<AgentConfiguration> AgentConfigurations => Set<AgentConfiguration>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            #region AgentMessage
 
             var e = modelBuilder.Entity<AgentMessage>();
 
@@ -59,7 +63,35 @@ namespace AgentFramework.Core.Data
 
             // Required timestamp
             e.Property(x => x.UtcCreatedAt)
-             .IsRequired();
+             .IsRequired(); 
+
+            #endregion
+
+            #region AgentConfiguration
+
+            var ac = modelBuilder.Entity<AgentConfiguration>();
+
+            ac.ToTable("agent_configurations");
+
+            // PK
+            ac.HasKey(x => x.Id);
+            ac.Property(x => x.Id)
+              .ValueGeneratedOnAdd();
+
+            // Name with index
+            ac.Property(x => x.Name)
+              .IsRequired()
+              .HasMaxLength(256);
+
+            ac.HasIndex(x => x.Name)
+              .HasDatabaseName("ix_agent_configurations_name");
+
+            var typeConverter = new TypeToStringConverter();
+            ac.Property(x => x.ResponseFormat)
+                .HasConversion(typeConverter)
+                .HasMaxLength(1024);
+
+            #endregion
         }
 
         public virtual async Task EnsureDatabaseReadyAsync(CancellationToken ct = default)
