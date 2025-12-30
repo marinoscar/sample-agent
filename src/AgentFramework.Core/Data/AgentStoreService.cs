@@ -9,16 +9,29 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Data
 {
+    /// <summary>
+    /// Provides data access services for managing agent messages and configurations in the agent store.
+    /// </summary>
+    /// <remarks>
+    /// This service implements the repository pattern for agent-related data operations,
+    /// providing methods for CRUD operations on agent messages and configurations.
+    /// </remarks>
     public class AgentStoreService : IAgentMessageStore
     {
         private readonly IAgentStoreContext _db;
         private static bool _isInitialized = false;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AgentStoreService"/> class.
+        /// </summary>
+        /// <param name="createContext">A factory function that creates an instance of <see cref="IAgentStoreContext"/>.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="createContext"/> is null or returns null.</exception>
         public AgentStoreService(Func<IAgentStoreContext> createContext)
         {
             _db = createContext() ?? throw new ArgumentNullException(nameof(createContext));
         }
 
+        /// <inheritdoc/>
         public async Task EnsureStoreIsReadyAsync(CancellationToken ct = default)
         {
             if(_isInitialized) return;
@@ -26,6 +39,7 @@ namespace AgentFramework.Core.Data
             _isInitialized = true;
         }
 
+        /// <inheritdoc/>
         public async Task<IReadOnlyList<AgentMessage>> GetByThreadIdAsync(
             AgentChatMetadata agentInfo,
             CancellationToken ct = default)
@@ -38,6 +52,7 @@ namespace AgentFramework.Core.Data
                 .ToListAsync(ct);
         }
 
+        /// <inheritdoc/>
         public async Task AddRangeAsync(
             AgentChatMetadata agentInfo,
             IEnumerable<AgentMessage> messages,
@@ -74,6 +89,7 @@ namespace AgentFramework.Core.Data
             await _db.SaveChangesAsync(ct);
         }
 
+        /// <inheritdoc/>
         public async Task<AgentConfiguration> GetAgentConfigurationByIdAsync(
             string agentId,
             CancellationToken ct = default)
@@ -81,6 +97,7 @@ namespace AgentFramework.Core.Data
             return await GetAgentConfigurationAsync(i => i.Id == agentId, $"Agent configuration not found for AgentId: {agentId}", ct);
         }
 
+        /// <inheritdoc/>
         public async Task<AgentConfiguration> GetAgentConfigurationByNameAsync(
             string agentName,
             CancellationToken ct = default)
@@ -88,6 +105,7 @@ namespace AgentFramework.Core.Data
             return await GetAgentConfigurationAsync(i => i.Name == agentName, $"Agent configuration not found for AgentName: {agentName}", ct);
         }
 
+        /// <inheritdoc/>
         public async Task<AgentConfiguration> GetAgentConfigurationAsync(Expression<Func<AgentConfiguration, bool>> expression, string? errorMessage = null, CancellationToken ct = default)
         {
             if (expression == null)
@@ -98,6 +116,7 @@ namespace AgentFramework.Core.Data
             return config ?? throw new InvalidOperationException(errorMessage ?? $"Agent configuration not found for the specified criteria.");
         }
 
+        /// <inheritdoc/>
         public async Task<IReadOnlyList<AgentConfiguration>> GetAllAgentConfigurationsAsync(
             CancellationToken ct = default)
         {
@@ -106,6 +125,7 @@ namespace AgentFramework.Core.Data
                 .ToListAsync(ct);
         }
 
+        /// <inheritdoc/>
         public async Task<AgentConfiguration> AddOrUpdateAsync(
             AgentConfiguration agentConfiguration,
             CancellationToken ct = default)
@@ -126,6 +146,12 @@ namespace AgentFramework.Core.Data
             return agentConfiguration;
         }
 
+        /// <summary>
+        /// Validates the agent chat metadata to ensure required fields are present.
+        /// </summary>
+        /// <param name="agentInfo">The agent chat metadata to validate.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="agentInfo"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when AgentId or ThreadId is null or whitespace.</exception>
         protected virtual void ValidateAgentInfo(AgentChatMetadata agentInfo)
         {
             if (agentInfo is null)
