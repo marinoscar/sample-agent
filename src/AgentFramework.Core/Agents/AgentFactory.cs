@@ -2,6 +2,7 @@
 using AgentFramework.Core.Data;
 using AgentFramework.Core.Middleware;
 using Microsoft.Agents.AI;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using OpenAI;
@@ -51,7 +52,39 @@ namespace AgentFramework.Core.Agents
             };
         }
 
-        public AIAgent CreateOpenAIAgent(AgentConfiguration agentSettings)
+        private AIAgent ApplyMiddleware(AIAgent innerAgent, AgentMiddlewareOptions middlewareOptions)
+        {
+            var agentBuilder = innerAgent.AsBuilder();
+
+            if (middlewareOptions.FunctionCalling != null)
+            {
+                agentBuilder = agentBuilder.Use(middlewareOptions.FunctionCalling);
+            }
+
+            if (middlewareOptions.Run != null || middlewareOptions.Streaming != null)
+            {
+                agentBuilder = agentBuilder.Use(middlewareOptions.Run, middlewareOptions.Streaming);
+            }
+
+            return agentBuilder.Build();
+        }
+
+        public AIAgent CreateAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
+        {
+            if(agentSettings == null) throw new ArgumentNullException(nameof(agentSettings));
+            if(string.IsNullOrEmpty(agentSettings.Provider)) throw new ArgumentException("Agent provider must be specified.", nameof(agentSettings.Provider));
+
+            return agentSettings.Provider?.ToLowerInvariant().Trim() switch
+            {
+                "openai" => CreateOpenAIAgent(agentSettings, middlewareOptions),
+                "azureopenai" => CreateAzureOpenAIAgent(agentSettings, middlewareOptions),
+                "anthropic" => CreateAnthropicAIAgent(agentSettings, middlewareOptions),
+                "gemini" => CreateGeminiAIAgent(agentSettings, middlewareOptions),
+                _ => throw new NotSupportedException($"The provider '{agentSettings.Provider}' is not supported."),
+            };
+        }
+
+        public AIAgent CreateOpenAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
         {
             var responsesClient = CreateOpenAIResponsesClient(agentSettings);
             var innerAgent = responsesClient.CreateAIAgent(options: new ChatClientAgentOptions()
@@ -73,24 +106,21 @@ namespace AgentFramework.Core.Agents
                 },
                 ChatMessageStoreFactory = GetStore(agentSettings),
             }, loggerFactory: _logger);
-            var agent = innerAgent.AsBuilder()
-                          .Use(InspectMiddleware.FunctionCallingMiddleware)
-                          .Use(InspectMiddleware.RunInspectionAsync, InspectMiddleware.RunStreamingInspectionAsync)
-                          .Build();
-            return agent;
+
+            return middlewareOptions != null ? ApplyMiddleware(innerAgent, middlewareOptions) : innerAgent;
         }
 
-        public AIAgent CreateAzureOpenAIAgent(AgentConfiguration agentSettings)
+        public AIAgent CreateAzureOpenAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
         {
             throw new NotImplementedException();
         }
 
-        public AIAgent CreateAnthropicAIAgent(AgentConfiguration agentSettings)
+        public AIAgent CreateAnthropicAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
         {
             throw new NotImplementedException();
         }
 
-        public AIAgent CreateGeminiAIAgent(AgentConfiguration agentSettings)
+        public AIAgent CreateGeminiAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
         {
             throw new NotImplementedException();
         }
