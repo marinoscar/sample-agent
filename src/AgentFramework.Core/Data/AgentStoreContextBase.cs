@@ -109,6 +109,8 @@ namespace AgentFramework.Core.Data
         /// <inheritdoc/>
         public virtual async Task EnsureDatabaseReadyAsync(CancellationToken ct = default)
         {
+            this.Entry(
+                )
             if (Database.IsRelational())
             {
                 await Database.MigrateAsync(ct);

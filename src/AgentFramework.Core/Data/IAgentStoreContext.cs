@@ -1,5 +1,6 @@
 ﻿using AgentFramework.Core.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -43,5 +44,14 @@ namespace AgentFramework.Core.Data
         /// Gets the database facade for performing database-level operations such as managing transactions or executing raw SQL commands.
         /// </summary>
         public DatabaseFacade Database { get; }
+
+
+        /// <summary>
+        /// Gets an <see cref="EntityEntry{TEntity}"/> for the given entity, providing access to change tracking information and operations for the entity.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the entity. Must be a reference type.</typeparam>
+        /// <param name="entity">The entity instance to get the entry for.</param>
+        /// <returns>An <see cref="EntityEntry{TEntity}"/> for the given entity.</returns>
+        EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
     }
 }

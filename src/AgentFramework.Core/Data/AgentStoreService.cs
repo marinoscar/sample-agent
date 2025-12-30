@@ -1,18 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AgentFramework.Core.Configuration;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Data
 {
-    public class AgentMessageStoreService : IAgentMessageStore
+    public class AgentStoreService : IAgentMessageStore
     {
         private readonly IAgentStoreContext _db;
         private static bool _isInitialized = false;
 
-        public AgentMessageStoreService(Func<IAgentStoreContext> createContext)
+        public AgentStoreService(Func<IAgentStoreContext> createContext)
         {
             _db = createContext() ?? throw new ArgumentNullException(nameof(createContext));
         }
@@ -70,6 +72,58 @@ namespace AgentFramework.Core.Data
 
             await _db.AgentMessages.AddRangeAsync(list, ct);
             await _db.SaveChangesAsync(ct);
+        }
+
+        public async Task<AgentConfiguration> GetAgentConfigurationByIdAsync(
+            string agentId,
+            CancellationToken ct = default)
+        {
+            return await GetAgentConfigurationAsync(i => i.Id == agentId, $"Agent configuration not found for AgentId: {agentId}", ct);
+        }
+
+        public async Task<AgentConfiguration> GetAgentConfigurationByNameAsync(
+            string agentName,
+            CancellationToken ct = default)
+        {
+            return await GetAgentConfigurationAsync(i => i.Name == agentName, $"Agent configuration not found for AgentName: {agentName}", ct);
+        }
+
+        public async Task<AgentConfiguration> GetAgentConfigurationAsync(Expression<Func<AgentConfiguration, bool>> expression, string? errorMessage = null, CancellationToken ct = default)
+        {
+            if (expression == null)
+                throw new ArgumentNullException(nameof(expression));
+            var config = await _db.AgentConfigurations
+                .AsNoTracking()
+                .FirstOrDefaultAsync(expression, ct);
+            return config ?? throw new InvalidOperationException(errorMessage ?? $"Agent configuration not found for the specified criteria.");
+        }
+
+        public async Task<IReadOnlyList<AgentConfiguration>> GetAllAgentConfigurationsAsync(
+            CancellationToken ct = default)
+        {
+            return await _db.AgentConfigurations
+                .AsNoTracking()
+                .ToListAsync(ct);
+        }
+
+        public async Task<AgentConfiguration> AddOrUpdateAsync(
+            AgentConfiguration agentConfiguration,
+            CancellationToken ct = default)
+        {
+            if (agentConfiguration is null)
+                throw new ArgumentNullException(nameof(agentConfiguration));
+            var existingConfig = await _db.AgentConfigurations
+                .FirstOrDefaultAsync(c => c.Id == agentConfiguration.Id, ct);
+            if (existingConfig is null)
+            {
+                await _db.AgentConfigurations.AddAsync(agentConfiguration, ct);
+            }
+            else
+            {
+                _db.Entry(existingConfig).CurrentValues.SetValues(agentConfiguration);
+            }
+            await _db.SaveChangesAsync(ct);
+            return agentConfiguration;
         }
 
         protected virtual void ValidateAgentInfo(AgentChatMetadata agentInfo)
