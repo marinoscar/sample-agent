@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Data
 {
-    public class DbAgentChatMessageStore : AgentChatMessageStore
+    public class DbAgentChatMessageStore : AgentChatMessageStoreBase
     {
 
         private readonly Func<IAgentMessageStore> _agentMessageStoreFactory;
