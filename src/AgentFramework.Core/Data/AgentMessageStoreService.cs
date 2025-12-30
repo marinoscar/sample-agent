@@ -9,10 +9,10 @@ namespace AgentFramework.Core.Data
 {
     public class AgentMessageStoreService : IAgentMessageStore
     {
-        private readonly IAgentMessageContext _db;
+        private readonly IAgentStoreContext _db;
         private static bool _isInitialized = false;
 
-        public AgentMessageStoreService(Func<IAgentMessageContext> createContext)
+        public AgentMessageStoreService(Func<IAgentStoreContext> createContext)
         {
             _db = createContext() ?? throw new ArgumentNullException(nameof(createContext));
         }

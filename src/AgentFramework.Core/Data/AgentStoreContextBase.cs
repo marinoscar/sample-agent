@@ -1,22 +1,34 @@
 ﻿using AgentFramework.Core.Configuration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Data
 {
-    public abstract class AgentStoreContextBase : DbContext, IAgentMessageContext
+    /// <summary>
+    /// Provides a base Entity Framework Core context for agent-related data, including agent messages and
+    /// configurations.
+    /// </summary>
+    /// <remarks>This abstract class defines the core schema and behaviors for storing agent messages and
+    /// configurations in a relational database. It must be extended by provider-specific implementations to supply
+    /// details such as the SQL data type for unbounded text columns. The context exposes DbSet properties for agent
+    /// messages and configurations, and includes a method to ensure the database is created or migrated as needed. This
+    /// class is intended for use as the foundation of an agent data store and should not be instantiated
+    /// directly.</remarks>
+    public abstract class AgentStoreContextBase : DbContext, IAgentStoreContext
     {
+
+        /// <summary>
+        /// Creates a new instance of <see cref="AgentStoreContextBase"/>.
+        /// </summary>
+        /// <param name="options">The options to be used by a <see cref="DbContext"/>.</param>
         protected AgentStoreContextBase(DbContextOptions options) : base(options) { }
 
+        /// <inheritdoc/>
         public DbSet<AgentMessage> AgentMessages => Set<AgentMessage>();
+
+        /// <inheritdoc/>
         public DbSet<AgentConfiguration> AgentConfigurations => Set<AgentConfiguration>();
 
+        /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -94,6 +106,7 @@ namespace AgentFramework.Core.Data
             #endregion
         }
 
+        /// <inheritdoc/>
         public virtual async Task EnsureDatabaseReadyAsync(CancellationToken ct = default)
         {
             if (Database.IsRelational())
@@ -106,7 +119,19 @@ namespace AgentFramework.Core.Data
             }
         }
 
-        // Provider-specific unbounded text type
+        /// <summary>
+        /// Gets the provider-specific SQL data type used for unbounded text columns.
+        /// </summary>
+        /// <remarks>
+        /// Different database providers use different data types for storing large text without length restrictions:
+        /// <list type="bullet">
+        /// <item><description>SQL Server: "nvarchar(max)"</description></item>
+        /// <item><description>PostgreSQL: "text"</description></item>
+        /// <item><description>SQLite: "TEXT"</description></item>
+        /// <item><description>MySQL: "longtext"</description></item>
+        /// </list>
+        /// This property must be overridden in provider-specific implementations to return the appropriate type name.
+        /// </remarks>
         protected abstract string UnboundedTextType { get; }
     }
 }
