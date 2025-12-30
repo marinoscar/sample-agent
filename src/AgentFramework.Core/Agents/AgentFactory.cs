@@ -142,7 +142,7 @@ namespace AgentFramework.Core.Agents
             }
             return (context) =>
             {
-                return new SqlChatMessageStore(_agentMessageStoreFactory, agentSettings.Id, agentSettings.Name,context.SerializedState, context.JsonSerializerOptions);
+                return new DbAgentChatMessageStore(_agentMessageStoreFactory, agentSettings.Id, agentSettings.Name,context.SerializedState, context.JsonSerializerOptions);
             };
         }
     }

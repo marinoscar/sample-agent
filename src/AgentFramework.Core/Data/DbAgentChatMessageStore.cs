@@ -1,4 +1,5 @@
 ﻿using AgentFramework.Core.Agents;
+using AgentFramework.Core.Configuration;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using System;
@@ -11,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Data
 {
-    public class SqlChatMessageStore : AgentChatMessageStore
+    public class DbAgentChatMessageStore : AgentChatMessageStore
     {
 
         private readonly Func<IAgentMessageStore> _agentMessageStoreFactory;
         private readonly IAgentMessageStore _agentMessageStore;
 
-        public SqlChatMessageStore(Func<IAgentMessageStore> agentMessageStoreFactory, string agentId, string agentName, JsonElement serializedStoreState, JsonSerializerOptions? jsonSerializerOptions = null) 
+        public DbAgentChatMessageStore(Func<IAgentMessageStore> agentMessageStoreFactory, string agentId, string agentName, JsonElement serializedStoreState, JsonSerializerOptions? jsonSerializerOptions = null) 
             : base(agentId, agentName, serializedStoreState, jsonSerializerOptions)
         {
             _agentMessageStoreFactory = agentMessageStoreFactory ?? throw new ArgumentNullException(nameof(agentMessageStoreFactory));
