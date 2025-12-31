@@ -21,23 +21,23 @@ namespace AgentFramework.Core.Data
     /// <item><description>AGENT_DB_PASSWORD - Database password</description></item>
     /// </list>
     /// </remarks>
-    public sealed class PostgresAgentMessageContext : AgentStoreContextBase
+    public sealed class NpgAgentContext : AgentStoreContextBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PostgresAgentMessageContext"/> class with the specified connection string.
+        /// Initializes a new instance of the <see cref="NpgAgentContext"/> class with the specified connection string.
         /// </summary>
         /// <param name="connectionString">The PostgreSQL connection string.</param>
-        public PostgresAgentMessageContext(string connectionString)
-            : base(new DbContextOptionsBuilder<PostgresAgentMessageContext>()
+        public NpgAgentContext(string connectionString)
+            : base(new DbContextOptionsBuilder<NpgAgentContext>()
                   .UseNpgsql(connectionString)
                   .Options)
         { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PostgresAgentMessageContext"/> class using environment variables for configuration.
+        /// Initializes a new instance of the <see cref="NpgAgentContext"/> class using environment variables for configuration.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when any required environment variable is not set.</exception>
-        public PostgresAgentMessageContext() : this(GetConnectionString())
+        public NpgAgentContext() : this(GetConnectionString())
         {
             
         }
