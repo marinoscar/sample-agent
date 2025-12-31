@@ -9,17 +9,17 @@ namespace DeepResearchAgent.Agents
     public abstract class AgentBase
     {
 
-        public string GetProvider()
+        protected string GetProvider()
         {
             return "OpenAI";
         }
 
-        public string GetModel()
+        protected string GetModel()
         {
             return "gpt-4o";
         }
 
-        public abstract string GetInstructions();
+        protected abstract string GetInstructions();
 
     }
 }

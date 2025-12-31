@@ -32,7 +32,7 @@ namespace DeepResearchAgent.Agents
             };
         }
 
-        public override string GetInstructions()
+        protected override string GetInstructions()
         {
             return @"
 # OrchestratorAgent
