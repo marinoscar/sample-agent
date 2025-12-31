@@ -16,24 +16,24 @@ using System.Threading.Tasks;
 namespace AgentFramework.Core.Data
 {
     /// <summary>
-    /// Provides a database-backed implementation of <see cref="AgentChatMessageStoreBase"/> that persists chat messages using an <see cref="IAgentMessageStore"/>.
+    /// Provides a database-backed implementation of <see cref="AgentChatMessageStoreBase"/> that persists chat messages using an <see cref="IAgentStore"/>.
     /// </summary>
     public class DbAgentChatMessageStore : AgentChatMessageStoreBase
     {
 
-        private readonly Func<IAgentMessageStore> _agentMessageStoreFactory;
-        private readonly IAgentMessageStore _agentMessageStore;
+        private readonly Func<IAgentStore> _agentMessageStoreFactory;
+        private readonly IAgentStore _agentMessageStore;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DbAgentChatMessageStore"/> class.
         /// </summary>
-        /// <param name="agentMessageStoreFactory">Factory function to create an <see cref="IAgentMessageStore"/> instance.</param>
+        /// <param name="agentMessageStoreFactory">Factory function to create an <see cref="IAgentStore"/> instance.</param>
         /// <param name="agentId">The unique identifier of the agent.</param>
         /// <param name="agentName">The name of the agent.</param>
         /// <param name="serializedStoreState">The serialized state of the store.</param>
         /// <param name="jsonSerializerOptions">Optional JSON serializer options.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="agentMessageStoreFactory"/> is null.</exception>
-        public DbAgentChatMessageStore(Func<IAgentMessageStore> agentMessageStoreFactory, string agentId, string agentName, JsonElement serializedStoreState, JsonSerializerOptions? jsonSerializerOptions = null) 
+        public DbAgentChatMessageStore(Func<IAgentStore> agentMessageStoreFactory, string agentId, string agentName, JsonElement serializedStoreState, JsonSerializerOptions? jsonSerializerOptions = null) 
             : base(agentId, agentName, serializedStoreState, jsonSerializerOptions)
         {
             _agentMessageStoreFactory = agentMessageStoreFactory ?? throw new ArgumentNullException(nameof(agentMessageStoreFactory));
@@ -73,7 +73,7 @@ namespace AgentFramework.Core.Data
         }
 
         /// <summary>
-        /// Ensures that the underlying message store is ready for operations by calling <see cref="IAgentMessageStore.EnsureStoreIsReadyAsync"/>.
+        /// Ensures that the underlying message store is ready for operations by calling <see cref="IAgentStore.EnsureStoreIsReadyAsync"/>.
         /// </summary>
         private void EnsureStoreIsReady()
         {

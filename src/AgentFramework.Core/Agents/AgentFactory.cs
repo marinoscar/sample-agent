@@ -21,10 +21,10 @@ namespace AgentFramework.Core.Agents
     {
 
         private readonly ILoggerFactory? _logger;
-        private readonly Func<IAgentMessageStore> _agentMessageStoreFactory;
+        private readonly Func<IAgentStore> _agentMessageStoreFactory;
         private static bool hasStoreBeenInitialized = false;
 
-        public AgentFactory(Func<IAgentMessageStore>? agentMessageStoreFactory = null, ILoggerFactory? loggerFactory = null)
+        public AgentFactory(Func<IAgentStore>? agentMessageStoreFactory = null, ILoggerFactory? loggerFactory = null)
         {
             _logger = loggerFactory;
             _agentMessageStoreFactory = agentMessageStoreFactory!;
@@ -50,6 +50,13 @@ namespace AgentFramework.Core.Agents
                 "gemini" => CreateGeminiAIAgent(agentSettings),
                 _ => throw new NotSupportedException($"The provider '{agentSettings.Provider}' is not supported."),
             };
+        }
+
+        public async Task<AgentConfiguration> PersistConfigurationAsync(AgentConfiguration config)
+        {
+            var store = _agentMessageStoreFactory();
+            store.AddOrUpdateAsync()
+            return config;
         }
 
         private AIAgent ApplyMiddleware(AIAgent innerAgent, AgentMiddlewareOptions middlewareOptions)

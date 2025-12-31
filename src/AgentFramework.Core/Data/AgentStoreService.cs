@@ -16,7 +16,7 @@ namespace AgentFramework.Core.Data
     /// This service implements the repository pattern for agent-related data operations,
     /// providing methods for CRUD operations on agent messages and configurations.
     /// </remarks>
-    public class AgentStoreService : IAgentMessageStore
+    public class AgentStoreService : IAgentStore
     {
         private readonly IAgentStoreContext _db;
         private static bool _isInitialized = false;
