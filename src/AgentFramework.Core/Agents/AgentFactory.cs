@@ -42,7 +42,7 @@ namespace AgentFramework.Core.Agents
 
         public AIAgent CreateAgent(AgentConfiguration agentSettings)
         {
-            return agentSettings.Provider?.ToLowerInvariant().Trim() switch
+            var agent = agentSettings.Provider?.ToLowerInvariant().Trim() switch
             {
                 "openai" => CreateOpenAIAgent(agentSettings),
                 "azureopenai" => CreateAzureOpenAIAgent(agentSettings),
@@ -50,6 +50,9 @@ namespace AgentFramework.Core.Agents
                 "gemini" => CreateGeminiAIAgent(agentSettings),
                 _ => throw new NotSupportedException($"The provider '{agentSettings.Provider}' is not supported."),
             };
+
+            AgentFactoryMemory.SetConfiguration(agent.Id, agentSettings);
+            return agent;
         }
 
         public async Task<AIAgent> CreateAgentAsync(string agentId, CancellationToken ct = default)
@@ -102,7 +105,7 @@ namespace AgentFramework.Core.Agents
             };
         }
 
-        public AIAgent CreateOpenAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
+        private AIAgent CreateOpenAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
         {
             var responsesClient = CreateOpenAIResponsesClient(agentSettings);
             var innerAgent = responsesClient.CreateAIAgent(options: new ChatClientAgentOptions()
@@ -128,17 +131,17 @@ namespace AgentFramework.Core.Agents
             return middlewareOptions != null ? ApplyMiddleware(innerAgent, middlewareOptions) : innerAgent;
         }
 
-        public AIAgent CreateAzureOpenAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
+        private AIAgent CreateAzureOpenAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
         {
             throw new NotImplementedException();
         }
 
-        public AIAgent CreateAnthropicAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
+        private AIAgent CreateAnthropicAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
         {
             throw new NotImplementedException();
         }
 
-        public AIAgent CreateGeminiAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
+        private AIAgent CreateGeminiAIAgent(AgentConfiguration agentSettings, AgentMiddlewareOptions? middlewareOptions = null)
         {
             throw new NotImplementedException();
         }
