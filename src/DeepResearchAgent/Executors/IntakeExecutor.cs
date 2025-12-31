@@ -1,4 +1,5 @@
-﻿using Microsoft.Agents.AI.Workflows;
+﻿using DeepResearchAgent.DTO;
+using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
 using System;
 using System.Collections.Generic;

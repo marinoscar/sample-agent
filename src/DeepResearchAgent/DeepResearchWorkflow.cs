@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DeepResearchAgent
 {
-    public class MainWorkflow
+    public class DeepResearchWorkflow
     {
     }
 }
