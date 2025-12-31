@@ -1,4 +1,5 @@
-﻿using AgentFramework.Core.Configuration;
+﻿using AgentFramework.Core.Agents;
+using AgentFramework.Core.Configuration;
 using DeepResearchAgent.DTO;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,10 @@ namespace DeepResearchAgent.Agents
 {
     public sealed class WebResearchAgent : AgentBase
     {
+        public WebResearchAgent(AgentFactory agentFactory) : base(agentFactory)
+        {
+        }
+
         protected override AgentConfiguration GetConfiguration()
         {
             return new AgentConfiguration

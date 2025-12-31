@@ -1,4 +1,5 @@
-﻿using AgentFramework.Core.Configuration;
+﻿using AgentFramework.Core.Agents;
+using AgentFramework.Core.Configuration;
 using DeepResearchAgent.DTO;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,10 @@ namespace DeepResearchAgent.Agents
 {
     public sealed class OrchestratorAgent : AgentBase
     {
+        public OrchestratorAgent(AgentFactory agentFactory) : base(agentFactory)
+        {
+        }
+
         /// <summary>
         /// Creates the default configuration for the OrchestratorAgent.
         /// You can persist this configuration to your DB and rehydrate later.
