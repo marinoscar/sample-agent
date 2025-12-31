@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Tools
 {
+    /// <summary>
+    /// Provides date and time related functionalities.
+    /// </summary>
     public class DateTimeTool
     {
         [Description("Gets the current date and time.")]
@@ -17,6 +20,15 @@ namespace AgentFramework.Core.Tools
             var utcNow = DateTime.UtcNow;
             var localTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, timeZoneInfo);
             return localTime;
+        }
+
+        [Description("Gets the current date (without time component).")]
+        public DateOnly GetCurrentDate()
+        {
+            var timeZoneInfo = GetTimeZoneInfoFromEnvVariable();
+            var utcNow = DateTime.UtcNow;
+            var localTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, timeZoneInfo);
+            return DateOnly.FromDateTime(localTime);
         }
 
         public AITool AsAITool()
