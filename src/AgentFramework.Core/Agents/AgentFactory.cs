@@ -52,10 +52,21 @@ namespace AgentFramework.Core.Agents
             };
         }
 
-        public async Task<AgentConfiguration> PersistConfigurationAsync(AgentConfiguration config)
+        public async Task<AIAgent> CreateAgentAsync(string agentId, CancellationToken ct = default)
+        {
+            var config = await _agentMessageStoreFactory().GetAgentConfigurationByIdAsync(agentId, ct);
+            return CreateAgent(config);
+        }
+
+        public AIAgent CreateAgent(string agentId)
+        {
+            return CreateAgentAsync(agentId).GetAwaiter().GetResult();
+        }
+
+        public async Task<AgentConfiguration> PersistConfigurationAsync(AgentConfiguration config, CancellationToken ct = default)
         {
             var store = _agentMessageStoreFactory();
-            store.AddOrUpdateAsync()
+            await store.AddOrUpdateAsync(config, ct);
             return config;
         }
 
