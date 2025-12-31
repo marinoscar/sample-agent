@@ -9,27 +9,38 @@ namespace DeepResearchAgent.DTO
     public sealed class WebResearchAgentResponse
     {
         /// <summary>
-        /// The sub-question identifier that these findings answer (e.g., "SQ3").
-        /// This is how the Orchestrator merges results.
+        /// The thread identifier that these findings correspond to.
+        /// This is how the Orchestrator aggregates thread results.
         /// </summary>
-        public required string SubQuestionId { get; init; }
+        public required string ThreadId { get; init; }
 
         /// <summary>
-        /// The claims and their supporting sources discovered during web research.
+        /// Claims that answer the thread prompt, each with citations.
         /// </summary>
         public List<ClaimFinding> Findings { get; init; } = new();
 
         /// <summary>
-        /// Any gaps the agent could not confidently answer with available sources.
-        /// The Orchestrator can decide to re-search with stricter queries.
+        /// Gaps that the agent could not fill with confidence.
+        /// The Orchestrator can decide to iterate with refined searches.
         /// </summary>
         public List<string> OpenGaps { get; init; } = new();
 
         /// <summary>
-        /// A lightweight audit trail of search queries attempted and what happened.
-        /// Helps you debug why a sub-question returned weak results.
+        /// Lightweight audit trail of queries attempted.
         /// </summary>
         public List<SearchLogEntry> SearchLog { get; init; } = new();
+
+        /// <summary>
+        /// Count of sources classified as primary in this thread response.
+        /// Helpful for Orchestrator quality gating.
+        /// </summary>
+        public int PrimarySourceCount { get; init; }
+
+        /// <summary>
+        /// Total distinct sources referenced across all findings in this thread response.
+        /// Helpful for Orchestrator quality gating.
+        /// </summary>
+        public int TotalSourceCount { get; init; }
     }
 
 }
