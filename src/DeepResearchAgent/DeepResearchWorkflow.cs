@@ -1,4 +1,6 @@
-﻿using DeepResearchAgent.DTO;
+﻿using AgentFramework.Core.Agents;
+using DeepResearchAgent.Agents;
+using DeepResearchAgent.DTO;
 using DeepResearchAgent.Executors;
 using Microsoft.Agents.AI.Workflows;
 using System;
@@ -11,11 +13,35 @@ namespace DeepResearchAgent
 {
     public class DeepResearchWorkflow
     {
+
+        private readonly AgentFactory _agentFactory;    
+
+        public DeepResearchWorkflow(AgentFactory agentFactory)
+        {
+            _agentFactory = agentFactory ?? throw new ArgumentNullException(nameof(agentFactory));
+        }
+
         private Func<ClarifierAgentResponse?, bool> NeedsClarification(bool expected) =>
             r => r is not null && r.NeedsClarification == expected;
 
         private Func<ThreadWorkItem?, bool> HasMoreThreads(bool expected) =>
             w => w is not null && w.IsDone == !expected; // expected=true => IsDone=false
+
+
+        public Workflow Build()
+        {
+            return Build(
+                new IntakeExecutor(),
+                new ScopeExecutor(new ClarifierAgent(_agentFactory).CreateAgent()),
+                new ClarificationOutputExecutor(),
+                new InitializeResearchQueueExecutor(),
+                new WebResearchExecutor(new WebResearchAgent(_agentFactory).CreateAgent()),
+                new AggregateAndNextExecutor(),
+                new SynthesisExecutor(new SynthesizerAgent(_agentFactory).CreateAgent()),
+                new FinalizeExecutor()
+            );
+        }
+
 
         public Workflow Build(
             IntakeExecutor intake,
