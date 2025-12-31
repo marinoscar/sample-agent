@@ -45,6 +45,9 @@ namespace AgentFramework.Terminal
             // Configure logging providers (console, file, etc.) through a custom initialization method.
             InitializeLogger(builder);
 
+            // Register application services into the DI container.
+            builder.Services.AddAgentFactory();
+
             // Build the Host from the configured builder.
             // This finalizes the DI container and prepares services for use.
             var app = builder.Build();
@@ -69,8 +72,11 @@ namespace AgentFramework.Terminal
         /// <param name="arguments">Parsed command-line options.</param>
         static void RunConsole(ConsoleOptions arguments)
         {
-            var openAiAgent = new AgentFactory().CreateOpenAIAgent(new AgentConfiguration
+            var openAiAgent = new AgentFactory().CreateAgent(new AgentConfiguration
             {
+                Provider = "OpenAI",
+                Id = "terminal-agent",
+                Name = "Terminal Agent",
                 Instructions = "You are a helpful AI assistant."
             });
 
