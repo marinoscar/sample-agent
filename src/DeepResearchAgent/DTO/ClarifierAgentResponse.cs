@@ -9,26 +9,26 @@ namespace DeepResearchAgent.DTO
     public sealed class ClarifierAgentResponse
     {
         /// <summary>
-        /// Indicates whether the user must answer follow-up questions before planning/research begins.
+        /// True if the system must ask the user follow-up questions before producing the ResearchBrief.
+        /// When true, populate Questions and AssumptionsIfNoAnswer. Brief should be null.
         /// </summary>
         public bool NeedsClarification { get; init; }
 
         /// <summary>
-        /// Clarifying questions to ask (recommended max 3).
-        /// When <see cref="NeedsClarification"/> is false, this should be empty.
+        /// 0–3 questions max. The user-facing questions to remove ambiguity.
         /// </summary>
         public List<string> Questions { get; init; } = new();
 
         /// <summary>
-        /// Assumptions to apply if the user does not provide answers.
-        /// Keys should be stable and predictable (e.g., "audience", "timeframe", "scope", "output_format").
+        /// Defaults to apply if the user does not answer.
+        /// Keys: "audience", "scope", "timeframe", "output_format", etc.
         /// </summary>
         public Dictionary<string, string> AssumptionsIfNoAnswer { get; init; } = new();
 
         /// <summary>
-        /// Normalized request derived from user input + assumptions.
-        /// This becomes the input to the PlannerAgent.
+        /// The fully formed ResearchBrief (Scope artifact).
+        /// Only set when NeedsClarification is false.
         /// </summary>
-        public ResearchTopicRequest? NormalizedRequest { get; init; }
+        public ResearchBrief? Brief { get; init; }
     }
 }
