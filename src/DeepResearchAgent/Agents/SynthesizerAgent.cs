@@ -10,7 +10,7 @@ namespace DeepResearchAgent.Agents
 {
     public sealed class SynthesizerAgent : AgentBase
     {
-        public AgentConfiguration CreateConfiguration()
+        protected override AgentConfiguration GetConfiguration()
         {
             return new AgentConfiguration
             {

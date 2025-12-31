@@ -14,7 +14,7 @@ namespace DeepResearchAgent.Agents
         /// Creates the default configuration for the OrchestratorAgent.
         /// You can persist this configuration to your DB and rehydrate later.
         /// </summary>
-        public AgentConfiguration CreateConfiguration()
+        protected override AgentConfiguration GetConfiguration()
         {
             return new AgentConfiguration
             {

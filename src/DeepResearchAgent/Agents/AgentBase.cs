@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AgentFramework.Core.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,8 @@ namespace DeepResearchAgent.Agents
         }
 
         protected abstract string GetInstructions();
+
+        protected abstract AgentConfiguration GetConfiguration();
 
     }
 }
