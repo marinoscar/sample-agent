@@ -29,7 +29,7 @@ namespace AgentFramework.Core.Agents
             _logger = loggerFactory;
             _agentMessageStoreFactory = agentMessageStoreFactory!;
 
-            _agentMessageStoreFactory ??= (() => new AgentStoreService(() => new SqliteAgentMessageContext()));
+            _agentMessageStoreFactory ??= (() => new AgentStoreService(() => new SqliteAgentContext()));
         }
 
         public async Task EnsureStoreIsReadyAsync(CancellationToken ct = default)

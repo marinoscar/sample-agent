@@ -13,20 +13,31 @@ namespace AgentFramework.Core.Data
     /// This context manages the persistence of agent messages and related data using a SQLite database.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// This implementation uses Entity Framework Core with SQLite as the database provider.
     /// The database connection can be configured via the AGENT_SQLITE_STORE environment variable.
     /// If not specified, a default database file "agent_messages.db" will be created in the application's base directory.
+    /// </para>
+    /// <para>
+    /// The database schema is automatically created on first use through the <see cref="EnsureDatabaseReadyAsync"/> method,
+    /// which is called during context initialization. This ensures the database is ready before any operations are performed.
+    /// </para>
+    /// <para>
+    /// This class is sealed and cannot be inherited. It extends <see cref="AgentStoreContextBase"/> to provide
+    /// SQLite-specific implementations of database operations.
+    /// </para>
     /// </remarks>
-    public sealed class SqliteAgentMessageContext : AgentStoreContextBase
+    public sealed class SqliteAgentContext : AgentStoreContextBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SqliteAgentMessageContext"/> class with the specified connection string.
+        /// Initializes a new instance of the <see cref="SqliteAgentContext"/> class with the specified connection string.
         /// </summary>
         /// <param name="connectionString">The SQLite connection string used to connect to the database.</param>
         /// <remarks>
         /// The constructor ensures the database is created and ready before returning by calling <see cref="EnsureDatabaseReadyAsync"/>.
         /// </remarks>
-        public SqliteAgentMessageContext(string connectionString)
-            : base(new DbContextOptionsBuilder<SqliteAgentMessageContext>()
+        public SqliteAgentContext(string connectionString)
+            : base(new DbContextOptionsBuilder<SqliteAgentContext>()
                   .UseSqlite(connectionString)
                   .Options)
         {
@@ -34,13 +45,13 @@ namespace AgentFramework.Core.Data
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SqliteAgentMessageContext"/> class using the default connection string.
+        /// Initializes a new instance of the <see cref="SqliteAgentContext"/> class using the default connection string.
         /// </summary>
         /// <remarks>
         /// The connection string is determined by the <see cref="GetConnectionString"/> method, which checks
         /// the AGENT_SQLITE_STORE environment variable or uses a default database location.
         /// </remarks>
-        public SqliteAgentMessageContext() : this(GetConnectionString())
+        public SqliteAgentContext() : this(GetConnectionString())
         {
 
         }

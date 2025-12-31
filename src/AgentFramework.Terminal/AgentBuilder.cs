@@ -2,6 +2,7 @@
 using AgentFramework.Core.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,14 +16,29 @@ namespace AgentFramework.Terminal
     /// </summary>
     public static class AgentBuilder
     {
-        public static HostApplicationBuilder InitializeAgentFactory(this HostApplicationBuilder builder)
+
+
+
+        public static HostApplicationBuilder AddAgentFactory(this HostApplicationBuilder builder, Func<IAgentStoreContext> contextFactory = null)
         {
-            // Register the AgentStoreService factory
-            builder.Services.AddScoped<Func<IAgentStore>>((c) =>
+            
+            if(contextFactory == null)
+                contextFactory = (() => new SqliteAgentContext());
+
+            // Register the IAgentStoreContext factory
+            builder.Services.AddScoped<Func<IAgentStoreContext>>(sp =>
             {
+                return contextFactory;
+            });
+
+
+            // Register the AgentStoreService factory
+            builder.Services.AddScoped<Func<IAgentStore>>(c =>
+            {
+                var agentContextFactory = c.GetRequiredService<Func<IAgentStoreContext>>();
                 return () =>
                 {
-                    return new AgentStoreService(() => new SqliteAgentMessageContext());
+                    return new AgentStoreService(agentContextFactory);
                 };
             });
 
@@ -30,7 +46,7 @@ namespace AgentFramework.Terminal
             builder.Services.AddScoped<AgentFactory>(sp =>
             {
                 var agentStoreFactory = sp.GetRequiredService<Func<IAgentStore>>();
-                var loggerFactory = sp.GetService<Microsoft.Extensions.Logging.ILoggerFactory>();
+                var loggerFactory = sp.GetService<ILoggerFactory>();
                 return new AgentFactory(agentStoreFactory, loggerFactory);
             });
 
