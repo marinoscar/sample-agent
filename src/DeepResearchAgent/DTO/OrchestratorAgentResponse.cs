@@ -9,59 +9,58 @@ namespace DeepResearchAgent.DTO
     public sealed class OrchestratorAgentResponse
     {
         /// <summary>
-        /// The current phase of the workflow.
-        /// Used by the caller/UI to show progress and to resume runs deterministically.
-        /// Example values: "intake", "plan", "retrieve", "synthesize", "final".
+        /// Workflow phase marker for progress and resumability.
+        /// Expected: "scope", "research", "write", "final".
         /// </summary>
         public required string Phase { get; init; }
 
         /// <summary>
-        /// True when the system must ask the user follow-up questions before proceeding.
-        /// When true, populate <see cref="ClarifyingQuestions"/> and pause orchestration.
+        /// True when the system must ask the user questions before continuing.
         /// </summary>
         public bool NeedsClarification { get; init; }
 
         /// <summary>
-        /// The clarifying questions to ask the user, if <see cref="NeedsClarification"/> is true.
-        /// Keep this list short (0–3 questions) to reduce friction.
+        /// Questions to ask the user if NeedsClarification is true.
         /// </summary>
         public List<string> ClarifyingQuestions { get; init; } = new();
 
         /// <summary>
-        /// Defaults/assumptions the system will apply if the user does not answer clarifying questions.
-        /// This improves usability and makes runs reproducible.
-        /// Example keys: "audience", "timeframe", "scope", "output_format".
+        /// Defaults used when user doesn’t answer clarifying questions.
         /// </summary>
         public Dictionary<string, string> Assumptions { get; init; } = new();
 
         /// <summary>
-        /// The final research plan selected for execution.
-        /// Present when Phase is "plan" or later.
+        /// The ResearchBrief produced during Scope.
+        /// Present from Phase "research" onward.
         /// </summary>
-        public ResearchPlanDto? Plan { get; init; }
+        public ResearchBrief? Brief { get; init; }
 
         /// <summary>
-        /// High-level status messages that can be shown to users/logs.
-        /// Example: "Dispatched 8 sub-questions to WebResearchAgent."
+        /// Aggregated findings per thread from WebResearchAgent.
+        /// Present from Phase "write" onward (or earlier if streaming progress).
+        /// </summary>
+        public List<WebResearchAgentResponse> ThreadFindings { get; init; } = new();
+
+        /// <summary>
+        /// IDs of threads needing more research due to failing quality gates (too few sources, low confidence, etc.).
+        /// </summary>
+        public List<string> ThreadsNeedingMoreResearch { get; init; } = new();
+
+        /// <summary>
+        /// Indicates whether the Orchestrator believes the system has enough evidence to proceed to writing.
+        /// </summary>
+        public bool ReadyForWrite { get; init; }
+
+        /// <summary>
+        /// Draft report returned by Synthesizer.
+        /// Present in Phase "write" or "final".
+        /// </summary>
+        public DraftReport? DraftReport { get; init; }
+
+        /// <summary>
+        /// Optional status messages for UI/logging.
+        /// Example: "Completed 6/8 research threads; re-running T3 for higher-quality sources."
         /// </summary>
         public List<string> Status { get; init; } = new();
-
-        /// <summary>
-        /// If true, the orchestrator believes enough evidence exists to proceed to synthesis.
-        /// This is where your "quality gates" are enforced (min sources, recency, etc.).
-        /// </summary>
-        public bool ReadyForSynthesis { get; init; }
-
-        /// <summary>
-        /// Optional list of sub-question IDs that require more research (e.g., not enough sources).
-        /// Used to trigger targeted re-search loops.
-        /// </summary>
-        public List<string> SubQuestionsNeedingMoreResearch { get; init; } = new();
-
-        /// <summary>
-        /// The assembled draft report returned from the SynthesizerAgent.
-        /// Present in Phase "synthesize" or "final".
-        /// </summary>
-        public DraftReportDto? DraftReport { get; init; }
     }
 }
