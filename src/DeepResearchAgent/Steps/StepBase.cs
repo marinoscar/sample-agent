@@ -1,9 +1,14 @@
-﻿using Microsoft.Agents.AI.Workflows;
+﻿using MassiveAPI.Responses;
+using Microsoft.Agents.AI.Workflows;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Logging;
+using OpenAI.Assistants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DeepResearchAgent.Steps
@@ -83,6 +88,50 @@ namespace DeepResearchAgent.Steps
         /// Any exceptions thrown from this method will be automatically logged and re-thrown by the base class.
         /// </remarks>
         public abstract ValueTask RunStepAsync(TInput message, IWorkflowContext context, CancellationToken cancellationToken = default);
+
+
+        /// <summary>
+        /// Deserializes a JSON string into an instance of the specified type using custom serialization options.
+        /// </summary>
+        /// <typeparam name="TResponse">The type to deserialize the JSON string into.</typeparam>
+        /// <param name="input">The JSON string to deserialize. Must be valid JSON that matches the structure of <typeparamref name="TResponse"/>.</param>
+        /// <param name="options">Custom JSON serialization options to control the deserialization behavior, including property naming policies, reference handling, and formatting.</param>
+        /// <returns>An instance of <typeparamref name="TResponse"/> populated with data from the JSON string.</returns>
+        /// <exception cref="JsonException">Thrown when the JSON is invalid or cannot be deserialized into <typeparamref name="TResponse"/>.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when deserialization completes successfully but returns null.</exception>
+        /// <remarks>
+        /// This overload allows full control over the deserialization process through the <paramref name="options"/> parameter.
+        /// Use this method when you need specific serialization settings that differ from the default behavior.
+        /// </remarks>
+        protected virtual TResponse Deserialize<TResponse>(string input, JsonSerializerOptions options)
+        {
+            return JsonSerializer.Deserialize<TResponse>(input, options)
+                   ?? throw new InvalidOperationException($"{typeof(TResponse).Name} deserialization returned null.");
+        }
+
+        /// <summary>
+        /// Deserializes a JSON string into an instance of the specified type using custom serialization options.
+        /// </summary>
+        /// <typeparam name="TResponse">The type to deserialize the JSON string into.</typeparam>
+        /// <param name="input">The JSON string to deserialize. Must be valid JSON that matches the structure of <typeparamref name="TResponse"/>.</param>
+        /// <returns>An instance of <typeparamref name="TResponse"/> populated with data from the JSON string.</returns>
+        /// <exception cref="JsonException">Thrown when the JSON is invalid or cannot be deserialized into <typeparamref name="TResponse"/>.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when deserialization completes successfully but returns null.</exception>
+        /// <remarks>
+        /// This overload allows full control over the deserialization process through the <paramref name="options"/> parameter.
+        /// Use this method when you need specific serialization settings that differ from the default behavior.
+        /// </remarks>
+        protected virtual TResponse Deserialize<TResponse>(string input)
+        {
+            return JsonSerializer.Deserialize<TResponse>(input, new JsonSerializerOptions() { 
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            }
+                ) ?? throw new InvalidOperationException($"{typeof(TResponse).Name} deserialization returned null.");
+        }
+
+
     }
 
     /// <summary>
@@ -166,5 +215,47 @@ namespace DeepResearchAgent.Steps
         /// The returned value will be passed to subsequent steps in the workflow.
         /// </remarks>
         public abstract ValueTask<TOutput> RunStepAsync(TInput message, IWorkflowContext context, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deserializes a JSON string into an instance of the specified type using custom serialization options.
+        /// </summary>
+        /// <typeparam name="TResponse">The type to deserialize the JSON string into.</typeparam>
+        /// <param name="input">The JSON string to deserialize. Must be valid JSON that matches the structure of <typeparamref name="TResponse"/>.</param>
+        /// <param name="options">Custom JSON serialization options to control the deserialization behavior, including property naming policies, reference handling, and formatting.</param>
+        /// <returns>An instance of <typeparamref name="TResponse"/> populated with data from the JSON string.</returns>
+        /// <exception cref="JsonException">Thrown when the JSON is invalid or cannot be deserialized into <typeparamref name="TResponse"/>.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when deserialization completes successfully but returns null.</exception>
+        /// <remarks>
+        /// This overload allows full control over the deserialization process through the <paramref name="options"/> parameter.
+        /// Use this method when you need specific serialization settings that differ from the default behavior.
+        /// </remarks>
+        protected virtual TResponse Deserialize<TResponse>(string input, JsonSerializerOptions options)
+        {
+            return JsonSerializer.Deserialize<TResponse>(input, options)
+                   ?? throw new InvalidOperationException($"{typeof(TResponse).Name} deserialization returned null.");
+        }
+
+        /// <summary>
+        /// Deserializes a JSON string into an instance of the specified type using custom serialization options.
+        /// </summary>
+        /// <typeparam name="TResponse">The type to deserialize the JSON string into.</typeparam>
+        /// <param name="input">The JSON string to deserialize. Must be valid JSON that matches the structure of <typeparamref name="TResponse"/>.</param>
+        /// <returns>An instance of <typeparamref name="TResponse"/> populated with data from the JSON string.</returns>
+        /// <exception cref="JsonException">Thrown when the JSON is invalid or cannot be deserialized into <typeparamref name="TResponse"/>.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when deserialization completes successfully but returns null.</exception>
+        /// <remarks>
+        /// This overload allows full control over the deserialization process through the <paramref name="options"/> parameter.
+        /// Use this method when you need specific serialization settings that differ from the default behavior.
+        /// </remarks>
+        protected virtual TResponse Deserialize<TResponse>(string input)
+        {
+            return JsonSerializer.Deserialize<TResponse>(input, new JsonSerializerOptions()
+            {
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            }
+                ) ?? throw new InvalidOperationException($"{typeof(TResponse).Name} deserialization returned null.");
+        }
     }
 }
