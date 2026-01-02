@@ -78,6 +78,7 @@ namespace AgentFramework.Terminal
             var wfBuilder = new DeepResearchWorkflow(app.Services.GetRequiredService<AgentFactory>());
             var workflow = wfBuilder.Build();
             var mermaidGraph = workflow.ToMermaidString();
+
             var agent = workflow.AsAgent(
                     id: "deep-research-workflow-agent",
                     name: "Deep Research Workflow Agent",
@@ -87,6 +88,7 @@ namespace AgentFramework.Terminal
             var thread = agent.GetNewThread();
 
             WriteConsole("How can I help you?");
+
             while (true)
             {
                 Console.WriteLine();
