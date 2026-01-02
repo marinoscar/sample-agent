@@ -2,10 +2,12 @@
 using AgentFramework.Core.Configuration;
 using DeepResearchAgent;
 using Microsoft.Agents.AI.Workflows;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using System.Diagnostics;
 
 namespace AgentFramework.Terminal
 {
@@ -79,42 +81,50 @@ namespace AgentFramework.Terminal
             var workflow = wfBuilder.Build();
             var mermaidGraph = workflow.ToMermaidString();
 
-            var agent = workflow.AsAgent(
-                    id: "deep-research-workflow-agent",
-                    name: "Deep Research Workflow Agent",
-                    description: "An agent that runs the Deep Research workflow."
-                );
-
-            var thread = agent.GetNewThread();
-
             WriteConsole("How can I help you?");
 
+            var prompt = Console.ReadLine();
+
+
             while (true)
-            {
-                Console.WriteLine();
-                var prompt = Console.ReadLine();
-                Console.WriteLine();
-                if (string.IsNullOrEmpty(prompt) || prompt.ToLowerInvariant() == "end")
-                    return;
-
-                var orignal = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.Green;
-
-                agent.StreamResponse(prompt, (update) =>
-                {
-                    if (update != null && !string.IsNullOrEmpty(update.Text))
-                    {
-                        Console.Write(update.Text);
-                    }
-                }, thread);
-
-                Console.ForegroundColor = orignal;
-                Console.WriteLine();
-                WriteConsole("Anything else I can help you with?");
-
-            }
+                RunSync(RunWorkflowAsync(workflow, prompt));
         }
 
+        private static async Task RunWorkflowAsync(Workflow workflow, string prompt)
+        {
+            var message = new ChatMessage(ChatRole.User, prompt);
+            Run result = default!;
+            try
+            {
+                result = await InProcessExecution.RunAsync(workflow, message);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            //            await using StreamingRun run = await InProcessExecution.StreamAsync(workflow, input: prompt);
+            //            await foreach (WorkflowEvent evt in run.WatchStreamAsync())
+            //            {
+            //                Debug.WriteLine(evt.Data);
+            //;                if (evt is WorkflowOutputEvent output)
+            //                {
+            //                    Console.WriteLine($"Workflow completed with results:\n{output.Data}");
+            //                }
+            //            }
+            Debug.WriteLine(result.ToString());
+        }
+
+        private static void RunSync(Task action, CancellationToken ct = default)
+        {
+            try
+            {
+                action.GetAwaiter().GetResult();
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                // Ignore cancellation exceptions triggered by the provided token.
+            }
+        }
 
         #region Console Methods
 
