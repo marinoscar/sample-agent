@@ -27,9 +27,19 @@ namespace DeepResearchAgent.Executors
             IWorkflowContext context,
             CancellationToken cancellationToken = default)
         {
-            var response = await _clarifierAgent.RunAsync(
-                JsonSerializer.Serialize(message),
+
+            var prompt = JsonSerializer.Serialize(message);
+            AgentRunResponse response = default!;
+            try
+            {
+                response = await _clarifierAgent.RunAsync(
+                prompt,
                 cancellationToken: cancellationToken);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
 
 
             return JsonSerializer.Deserialize<ClarifierAgentResponse>(response.Text)
