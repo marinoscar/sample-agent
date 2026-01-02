@@ -80,6 +80,7 @@ namespace DeepResearchAgent
                 .AddEdge(aggregateAndNext, webResearch, HasMoreThreads(expected: true))
                 .AddEdge(aggregateAndNext, synthesis, HasMoreThreads(expected: false))
                 .AddEdge(synthesis, finalize)
+                .WithOutputFrom(finalize)
                 .Build();
 
             return workflow;
