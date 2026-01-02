@@ -1,5 +1,7 @@
 ﻿using AgentFramework.Core.Agents;
 using AgentFramework.Core.Configuration;
+using DeepResearchAgent;
+using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -59,7 +61,7 @@ namespace AgentFramework.Terminal
             _logger = factory.CreateLogger<Program>();
 
             // Execute the main console logic, passing in parsed command-line arguments.
-            RunConsole(arguments);
+            RunConsole(arguments, app);
 
             // Keep the application alive and responsive (useful for background services).
             // This blocks until the host is shut down (e.g., by Ctrl+C).
@@ -70,17 +72,19 @@ namespace AgentFramework.Terminal
         /// Executes the main logic of the application.
         /// </summary>
         /// <param name="arguments">Parsed command-line options.</param>
-        static void RunConsole(ConsoleOptions arguments)
+        /// <param name="app">The host application instance.</param>
+        static void RunConsole(ConsoleOptions arguments, IHost app)
         {
-            var openAiAgent = new AgentFactory().CreateAgent(new AgentConfiguration
-            {
-                Provider = "OpenAI",
-                Id = "terminal-agent",
-                Name = "Terminal Agent",
-                Instructions = "You are a helpful AI assistant."
-            });
+            var wfBuilder = new DeepResearchWorkflow(app.Services.GetRequiredService<AgentFactory>());
+            var workflow = wfBuilder.Build();
+            var mermaidGraph = workflow.ToMermaidString();
+            var agent = workflow.AsAgent(
+                    id: "deep-research-workflow-agent",
+                    name: "Deep Research Workflow Agent",
+                    description: "An agent that runs the Deep Research workflow."
+                );
 
-            var thread = openAiAgent.GetNewThread();
+            var thread = agent.GetNewThread();
 
             WriteConsole("How can I help you?");
             while (true)
@@ -94,7 +98,7 @@ namespace AgentFramework.Terminal
                 var orignal = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Green;
 
-                openAiAgent.StreamResponse(prompt, (update) =>
+                agent.StreamResponse(prompt, (update) =>
                 {
                     if (update != null && !string.IsNullOrEmpty(update.Text))
                     {
