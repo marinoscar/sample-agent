@@ -24,7 +24,7 @@ namespace DeepResearchAgent.Executors
             {
                 needs_clarification = true,
                 questions = message.Questions,
-                assumptions_if_no_answer = message.AssumptionsIfNoAnswer
+                //assumptions_if_no_answer = message.AssumptionsIfNoAnswer
             });
         }
     }

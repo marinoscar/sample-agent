@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AgentFramework.Core.Configuration
@@ -87,7 +89,7 @@ namespace AgentFramework.Core.Configuration
         /// </remarks>
         /// <value>A unique identifier string. Default: <c>Guid.NewGuid().ToString("N")</c></value>
         public string Id { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the AI provider name for this agent configuration.
         /// Identifies which AI service provider should be used to instantiate the agent.
@@ -110,7 +112,7 @@ namespace AgentFramework.Core.Configuration
         /// </remarks>
         /// <value>The provider name string. Default: <c>"OpenAI"</c></value>
         public string Provider { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the display name for this agent configuration.
         /// Used for identification in user interfaces and logging.
@@ -130,7 +132,7 @@ namespace AgentFramework.Core.Configuration
         /// </remarks>
         /// <value>The agent name string. Default: <c>"Default Agent"</c></value>
         public string Name { get; set; }
-        
+
         /// <summary>
         /// Gets or sets an optional description for this agent configuration.
         /// Provides additional context about the agent's purpose or capabilities.
@@ -149,7 +151,7 @@ namespace AgentFramework.Core.Configuration
         /// </remarks>
         /// <value>An optional description string. Default: <c>string.Empty</c></value>
         public string? Description { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the AI model identifier to use for this agent.
         /// Specifies which specific model version or variant should be used by the provider.
@@ -172,7 +174,7 @@ namespace AgentFramework.Core.Configuration
         /// </remarks>
         /// <value>The model identifier string. Default: <c>"gpt-5-nano"</c></value>
         public string? Model { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the system instructions (system prompt) that define the agent's behavior and personality.
         /// These instructions guide how the agent responds and interacts with users.
@@ -192,7 +194,7 @@ namespace AgentFramework.Core.Configuration
         /// </remarks>
         /// <value>The system instructions string. Default: <c>"You are a helpful AI assistant."</c></value>
         public string? Instructions { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the tool invocation mode that controls how the agent uses available tools.
         /// Determines whether tools are automatically invoked or require explicit confirmation.
@@ -219,7 +221,7 @@ namespace AgentFramework.Core.Configuration
         /// <value>The tool mode name string. Default: <c>ChatToolMode.Auto.GetType().Name</c> (typically "Auto")</value>
         /// <seealso cref="GetToolMode"/>
         public string? ToolMode { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the temperature parameter that controls randomness in the AI model's responses.
         /// Higher values (e.g., 0.8) make output more random; lower values (e.g., 0.2) make it more deterministic.
@@ -311,7 +313,7 @@ namespace AgentFramework.Core.Configuration
         /// <value>A <see cref="Type"/> object defining the response schema, or null for text. Default: <c>null</c></value>
         /// <seealso cref="GetResponseFormat"/>
         public Type? ResponseFormat { get; set; }
-        
+
         /// <summary>
         /// Gets or sets a comma-separated list of tool identifiers that are available to this agent.
         /// Tools extend the agent's capabilities by allowing it to perform specific actions or access external services.
@@ -342,7 +344,7 @@ namespace AgentFramework.Core.Configuration
         /// </remarks>
         /// <value>A comma-separated list of tool identifiers. Default: <c>"web_search,code_interpreter,datetime"</c></value>
         public string ToolList { get; set; }
-        
+
         /// <summary>
         /// Gets or sets additional provider-specific or custom settings as a serialized string.
         /// Can store JSON, XML, or other formatted configuration data that doesn't fit into standard properties.
@@ -554,6 +556,7 @@ namespace AgentFramework.Core.Configuration
                 return ChatResponseFormat.Text;
             }
             var schema = AIJsonUtilities.CreateJsonSchema(ResponseFormat);
+            Debug.WriteLine(schema);
             return ChatResponseFormat.ForJsonSchema(
                                                 schema: schema,
                                                 schemaName: ResponseFormat.Name,

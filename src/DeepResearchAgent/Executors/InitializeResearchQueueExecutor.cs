@@ -26,21 +26,21 @@ namespace DeepResearchAgent.Executors
             if (message.NeedsClarification)
                 throw new InvalidOperationException("InitializeResearchQueueExecutor must only run when clarification is NOT needed.");
 
-            if (message.Brief is null)
-                throw new InvalidOperationException("ClarifierAgentResponse.Brief was null when clarification was not needed.");
+            //if (message.Brief is null)
+            //    throw new InvalidOperationException("ClarifierAgentResponse.Brief was null when clarification was not needed.");
 
-            // Persist the brief for downstream executors.
-            await context.QueueStateUpdateAsync("brief", message.Brief, scopeName: ResearchScope);
+            //// Persist the brief for downstream executors.
+            //await context.QueueStateUpdateAsync("brief", message.Brief, scopeName: ResearchScope);
 
-            // Initialize queue with thread IDs.
-            var threadIds = message.Brief.Threads.Select(t => t.Id).ToList();
-            await context.QueueStateUpdateAsync("thread_ids", threadIds, scopeName: QueueScope);
+            //// Initialize queue with thread IDs.
+            //var threadIds = message.Brief.Threads.Select(t => t.Id).ToList();
+            //await context.QueueStateUpdateAsync("thread_ids", threadIds, scopeName: QueueScope);
 
-            // Emit first thread work item (or done if none).
-            var next = message.Brief.Threads.FirstOrDefault();
+            //// Emit first thread work item (or done if none).
+            var next = ThreadWorkItem.Next("");
             return next is null
                 ? ThreadWorkItem.Done()
-                : ThreadWorkItem.Next(next.Id);
+                : ThreadWorkItem.Next(next.ThreadId ?? "");
         }
     }
 }

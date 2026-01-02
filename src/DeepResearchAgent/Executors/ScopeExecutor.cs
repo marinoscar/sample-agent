@@ -30,20 +30,26 @@ namespace DeepResearchAgent.Executors
 
             var prompt = JsonSerializer.Serialize(message);
             AgentRunResponse response = default!;
+            ClarifierAgentResponse result = default!;
             try
             {
                 response = await _clarifierAgent.RunAsync(
                 prompt,
                 cancellationToken: cancellationToken);
+
+
+            result =  JsonSerializer.Deserialize<ClarifierAgentResponse>(response.Text, new JsonSerializerOptions() { 
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            })
+                   ?? throw new InvalidOperationException("ClarifierAgent returned invalid JSON.");
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
 
-
-            return JsonSerializer.Deserialize<ClarifierAgentResponse>(response.Text)
-                   ?? throw new InvalidOperationException("ClarifierAgent returned invalid JSON.");
+            return result;
         }
     }
 }
