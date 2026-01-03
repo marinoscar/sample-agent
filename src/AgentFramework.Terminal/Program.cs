@@ -76,7 +76,7 @@ namespace AgentFramework.Terminal
         /// <param name="app">The host application instance.</param>
         static void RunConsole(ConsoleOptions arguments, IHost app)
         {
-
+            var workflowBuilder = new DeepResearchWorkflow(app.Services); 
         }
 
         private static async Task RunWorkflowAsync(Workflow workflow, string prompt)

@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AgentFramework.Core.DeepResearch\AgentFramework.Core.DeepResearch.csproj" />
     <ProjectReference Include="..\AgentFramework.Core\AgentFramework.Core.csproj" />
-    <ProjectReference Include="..\DeepResearchAgent\DeepResearchAgent.csproj" />
   </ItemGroup>
 
 </Project>
