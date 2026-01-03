@@ -36,6 +36,14 @@ namespace AgentFramework.Core.Workflows
         public ILogger Logger { get; init; }
 
         /// <summary>
+        /// Gets the factory used to create logger instances for this component.
+        /// </summary>
+        /// <remarks>Use this property to configure or retrieve loggers for diagnostic and monitoring
+        /// purposes. The logger factory can be used to create loggers with specific categories or settings as
+        /// needed.</remarks>
+        public ILoggerFactory LoggerFactory { get; init; }
+
+        /// <summary>
         /// Gets the unique identifier for this workflow.
         /// </summary>
         /// <value>
@@ -69,7 +77,8 @@ namespace AgentFramework.Core.Workflows
             Id = id;
             Name = name;
             Factory = agentFactory ?? throw new ArgumentNullException(nameof(agentFactory));
-            Logger = loggerFactory?.CreateLogger(id) ?? throw new ArgumentNullException(nameof(loggerFactory));
+            LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            Logger = LoggerFactory.CreateLogger(id);
 
         }
 
