@@ -1,4 +1,5 @@
 ﻿using AgentFramework.Core.Configuration;
+using AgentFramework.Core.DeepResearch.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -160,7 +161,7 @@ It should define:
                 Instructions = instructions,
                 Temperature = 0f,
                 PersistConversation = PersistConversation,
-                ResponseFormat = null,
+                ResponseFormat = typeof(ResearchTopic),
                 ToolList = DefaultTools
             };
 
@@ -314,7 +315,7 @@ Avoid vague items like:
                 Instructions = instructions,
                 Temperature = 0f,
                 PersistConversation = PersistConversation,
-                ResponseFormat = null,
+                ResponseFormat = typeof(ResearchPlan),
                 ToolList = DefaultTools
             };
 
@@ -483,7 +484,7 @@ Before returning JSON:
                 Instructions = instructions,
                 Temperature = 0f,
                 PersistConversation = PersistConversation,
-                ResponseFormat = null,
+                ResponseFormat = typeof(ResearchAggregate),
                 ToolList = DefaultTools
             };
 
@@ -621,7 +622,7 @@ Before returning JSON:
                 Instructions = instructions,
                 Temperature = 0f,
                 PersistConversation = PersistConversation,
-                ResponseFormat = null,
+                ResponseFormat = typeof(FinalResearchReport),
                 ToolList = DefaultTools
             };
 
