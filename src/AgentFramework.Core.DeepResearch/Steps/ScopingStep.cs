@@ -18,9 +18,19 @@ namespace AgentFramework.Core.DeepResearch.Steps
         {
         }
 
-        public override ValueTask<ResearchTopic> RunStepAsync(ChatMessage message, IWorkflowContext context, CancellationToken cancellationToken = default)
+        public override async ValueTask<ResearchTopic> RunStepAsync(ChatMessage message, IWorkflowContext context, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var prompt = message.Text;
+            var topic = new ResearchTopic
+            {
+                Topic = prompt
+            };
+            var jsonInput = Serialize(topic);
+
+            var response = await Agent.RunAsync(jsonInput, cancellationToken: cancellationToken);
+            var result = Deserialize<ResearchTopic>(response.Text);
+            
+            return result;
         }
     }
 }
