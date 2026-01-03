@@ -30,21 +30,55 @@ namespace AgentFramework.Core.DeepResearch.Steps
                 ItemFindingsMarkdown = new List<string>(),
                 ItemSources = new List<string>()
             };
+
+            var lockObject = new object();
+            var semaphore = new SemaphoreSlim(5, 5);
+            var tasks = new List<Task>();
+
             foreach (var researchItem in message.ResearchTopicList)
             {
-                var task = new ResearchTask
+                await semaphore.WaitAsync(cancellationToken);
+
+                var task = Task.Run(async () =>
                 {
-                    Topic = message.Topic, Audience = message.Audience, Constraints = message.Constraints,
-                    ResearchItem = researchItem, PlannerNotes = message.PlannerNotes
-                };
+                    try
+                    {
+                        var researchTask = new ResearchTask
+                        {
+                            Topic = message.Topic,
+                            Audience = message.Audience,
+                            Constraints = message.Constraints,
+                            ResearchItem = researchItem,
+                            PlannerNotes = message.PlannerNotes
+                        };
 
-                var jsonInput = Serialize(task);
-                var response = await Agent.RunAsync(jsonInput, cancellationToken: cancellationToken);
-                var aggregate = Deserialize<ResearchAggregate>(response.Text);
+                        Logger.LogInformation($"Running topic: {researchItem}");
 
-                result.ItemFindingsMarkdown.AddRange(aggregate.ItemFindingsMarkdown);
-                result.ItemSources.AddRange(aggregate.ItemSources);
+                        var jsonInput = Serialize(researchTask);
+                        var response = await Agent.RunAsync(jsonInput, cancellationToken: cancellationToken);
+                        var aggregate = Deserialize<ResearchAggregate>(response.Text);
+
+
+                        lock (lockObject)
+                        {
+                            result.ItemFindingsMarkdown.AddRange(aggregate.ItemFindingsMarkdown);
+                            result.ItemSources.AddRange(aggregate.ItemSources);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex, $"Error processing research item: {researchItem}");
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                }, cancellationToken);
+
+                tasks.Add(task);
             }
+
+            await Task.WhenAll(tasks);
 
             return result;
         }
