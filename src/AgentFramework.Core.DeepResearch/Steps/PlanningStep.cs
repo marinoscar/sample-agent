@@ -17,9 +17,12 @@ namespace AgentFramework.Core.DeepResearch.Steps
         {
         }
 
-        public override ValueTask<ResearchPlan> RunStepAsync(ResearchTopic message, IWorkflowContext context, CancellationToken cancellationToken = default)
+        public override async ValueTask<ResearchPlan> RunStepAsync(ResearchTopic message, IWorkflowContext context, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var prompt = Serialize(message);
+            var response = await Agent.RunAsync(prompt, cancellationToken: cancellationToken);
+            var result = Deserialize<ResearchPlan>(response.Text);
+            return result;
         }
     }
 }
