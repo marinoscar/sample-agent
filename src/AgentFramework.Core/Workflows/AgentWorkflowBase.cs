@@ -1,4 +1,5 @@
 ﻿using AgentFramework.Core.Agents;
+using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.Logging;
 using System;
@@ -93,5 +94,11 @@ namespace AgentFramework.Core.Workflows
         /// configure the workflow steps, transitions, and execution logic.
         /// </remarks>
         public abstract Workflow Build();
+
+        /// <summary>
+        /// Gets the initial agent to be used at the start of the AI workflow.
+        /// </summary>
+        /// <returns>An instance of <see cref="AIAgent"/> representing the starting agent. Never null.</returns>
+        public abstract AIAgent GetStartAgent();
     }
 }
