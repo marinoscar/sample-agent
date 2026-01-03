@@ -17,9 +17,36 @@ namespace AgentFramework.Core.DeepResearch.Steps
         {
         }
 
-        public override ValueTask<ResearchAggregate> RunStepAsync(ResearchPlan message, IWorkflowContext context, CancellationToken cancellationToken = default)
+        public override async ValueTask<ResearchAggregate> RunStepAsync(ResearchPlan message, IWorkflowContext context, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var result = new ResearchAggregate
+            {
+                Topic = message.Topic,
+                Audience = message.Audience,
+                OutputFormat = message.OutputFormat,
+                Constraints = message.Constraints,
+                PlannerNotes = message.PlannerNotes,
+                ResearchTopicList = message.ResearchTopicList,
+                ItemFindingsMarkdown = new List<string>(),
+                ItemSources = new List<string>()
+            };
+            foreach (var researchItem in message.ResearchTopicList)
+            {
+                var task = new ResearchTask
+                {
+                    Topic = message.Topic, Audience = message.Audience, Constraints = message.Constraints,
+                    ResearchItem = researchItem, PlannerNotes = message.PlannerNotes
+                };
+
+                var jsonInput = Serialize(researchItem);
+                var response = await Agent.RunAsync(jsonInput, cancellationToken: cancellationToken);
+                var aggregate = Deserialize<ResearchAggregate>(response.Text);
+
+                result.ItemFindingsMarkdown.AddRange(aggregate.ItemFindingsMarkdown);
+                result.ItemSources.AddRange(aggregate.ItemSources);
+            }
+
+            return result;
         }
     }
 }
