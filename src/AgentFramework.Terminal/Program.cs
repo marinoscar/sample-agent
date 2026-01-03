@@ -1,6 +1,5 @@
 ﻿using AgentFramework.Core.Agents;
 using AgentFramework.Core.Configuration;
-using DeepResearchAgent;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -77,17 +76,7 @@ namespace AgentFramework.Terminal
         /// <param name="app">The host application instance.</param>
         static void RunConsole(ConsoleOptions arguments, IHost app)
         {
-            var wfBuilder = new DeepResearchWorkflow(app.Services.GetRequiredService<AgentFactory>());
-            var workflow = wfBuilder.Build();
-            var mermaidGraph = workflow.ToMermaidString();
 
-            WriteConsole("How can I help you?");
-
-            var prompt = Console.ReadLine();
-
-
-            while (true)
-                RunSync(RunWorkflowAsync(workflow, prompt));
         }
 
         private static async Task RunWorkflowAsync(Workflow workflow, string prompt)
