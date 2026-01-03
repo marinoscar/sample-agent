@@ -1,5 +1,6 @@
 ﻿using AgentFramework.Core.Agents;
 using AgentFramework.Core.Configuration;
+using AgentFramework.Core.DeepResearch;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -77,41 +78,13 @@ namespace AgentFramework.Terminal
         static void RunConsole(ConsoleOptions arguments, IHost app)
         {
             var workflowBuilder = new DeepResearchWorkflow(app.Services); 
-        }
-
-        private static async Task RunWorkflowAsync(Workflow workflow, string prompt)
-        {
-            var message = new ChatMessage(ChatRole.User, prompt);
-            Run result = default!;
-            try
+            var workflow = workflowBuilder.Build();
+            var prompt = "Write a detailed research report on the impact of climate change on global agriculture.";
+            var message = new TextContent(prompt);
+            var run = InProcessExecution.RunAsync(workflow, message).GetAwaiter().GetResult();
+            foreach(var evt in run.OutgoingEvents)
             {
-                result = await InProcessExecution.RunAsync(workflow, message);
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            //            await using StreamingRun run = await InProcessExecution.StreamAsync(workflow, input: prompt);
-            //            await foreach (WorkflowEvent evt in run.WatchStreamAsync())
-            //            {
-            //                Debug.WriteLine(evt.Data);
-            //;                if (evt is WorkflowOutputEvent output)
-            //                {
-            //                    Console.WriteLine($"Workflow completed with results:\n{output.Data}");
-            //                }
-            //            }
-            Debug.WriteLine(result.ToString());
-        }
-
-        private static void RunSync(Task action, CancellationToken ct = default)
-        {
-            try
-            {
-                action.GetAwaiter().GetResult();
-            }
-            catch (OperationCanceledException) when (ct.IsCancellationRequested)
-            {
-                // Ignore cancellation exceptions triggered by the provided token.
+                Console.WriteLine(evt.Data);
             }
         }
 
