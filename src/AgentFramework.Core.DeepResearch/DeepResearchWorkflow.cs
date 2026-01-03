@@ -18,10 +18,10 @@ namespace AgentFramework.Core.DeepResearch
 
         private AIAgent _startAgent;
 
-        public DeepResearchWorkflow(IServiceProvider services) : 
+        public DeepResearchWorkflow(IServiceProvider services) :
             this(services.GetRequiredService<AgentFactory>(), services.GetRequiredService<ILoggerFactory>())
         {
-            
+
         }
 
         public DeepResearchWorkflow(AgentFactory agentFactory, ILoggerFactory loggerFactory) : base("DeepResearchAgent", "Deep Research Agent", agentFactory, loggerFactory)
@@ -46,8 +46,7 @@ namespace AgentFramework.Core.DeepResearch
             var writingStep = new WriterStep(writer, LoggerFactory);
 
             var workflow = new WorkflowBuilder(scopingStep)
-                .AddEdge(planningStep, researchStep)
-                .AddEdge(researchStep, writingStep)
+                .AddChain(scopingStep, [planningStep, research, writingStep])
                 .WithOutputFrom(writingStep)
                 .Build();
 
