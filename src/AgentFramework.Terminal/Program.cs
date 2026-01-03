@@ -77,6 +77,8 @@ namespace AgentFramework.Terminal
         /// <param name="app">The host application instance.</param>
         static void RunConsole(ConsoleOptions arguments, IHost app)
         {
+            Console.Clear();
+
             var workflowBuilder = new DeepResearchWorkflow(app.Services);
             var workflow = workflowBuilder.Build();
             var prompt = "Write a detailed research report on the impact of climate change on global agriculture.";

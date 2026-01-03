@@ -46,7 +46,9 @@ namespace AgentFramework.Core.DeepResearch
             var writingStep = new WriterStep(writer, LoggerFactory);
 
             var workflow = new WorkflowBuilder(scopingStep)
-                .AddChain(scopingStep, [planningStep, research, writingStep])
+                .AddEdge(scopingStep, planningStep)
+                .AddEdge(planningStep, researchStep)
+                .AddEdge(researchStep, writingStep)
                 .WithOutputFrom(writingStep)
                 .Build();
 
