@@ -1,6 +1,7 @@
 ﻿using AgentFramework.Core.Agents;
 using AgentFramework.Core.DeepResearch.Steps;
 using AgentFramework.Core.Workflows;
+using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,8 @@ namespace AgentFramework.Core.DeepResearch
 {
     public class DeepResearchWorkflow : AgentWorkflowBase
     {
+
+        private AIAgent _startAgent;
 
         public DeepResearchWorkflow(IServiceProvider services) : 
             this(services.GetRequiredService<AgentFactory>(), services.GetRequiredService<ILoggerFactory>())
@@ -33,6 +36,8 @@ namespace AgentFramework.Core.DeepResearch
             var research = Factory.CreateAgent(cb.CreateResearchAgentConfig());
             var writer = Factory.CreateAgent(cb.CreateWriterAgentConfig());
 
+            _startAgent = scoping;
+
             var mainThread = scoping.GetNewThread();
 
             var scopingStep = new ScopingStep(Factory.CreateAgent(cb.CreateScopingAgentConfig()), LoggerFactory);
@@ -47,6 +52,13 @@ namespace AgentFramework.Core.DeepResearch
                 .Build();
 
             return workflow;
+        }
+
+        /// <inheritdoc/>
+        public override AIAgent GetStartAgent()
+        {
+            if (_startAgent == null) throw new InvalidOperationException("You need to run the Build method first");
+            return _startAgent;
         }
     }
 }
