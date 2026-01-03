@@ -18,6 +18,12 @@ namespace AgentFramework.Core.DeepResearch
 
         public override Workflow Build()
         {
+            var cb = new AgentBuilder();
+            var scoping = Factory.CreateAgent(cb.CreateScopingAgentConfig());
+            var planning = Factory.CreateAgent(cb.CreatePlanningAgentConfig());
+            var research = Factory.CreateAgent(cb.CreateResearchAgentConfig());
+            var writer = Factory.CreateAgent(cb.CreateWriterAgentConfig()); 
+
             throw new NotImplementedException();
         }
     }
