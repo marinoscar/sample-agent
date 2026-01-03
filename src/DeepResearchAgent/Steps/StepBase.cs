@@ -1,4 +1,5 @@
 ﻿using MassiveAPI.Responses;
+using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Logging;
@@ -34,7 +35,7 @@ namespace DeepResearchAgent.Steps
         /// Gets the logger instance used for logging step execution information and errors.
         /// The logger is initialized with the step's unique identifier as the category name.
         /// </summary>
-        public ILogger Logger { get; init; }
+        protected ILogger Logger { get; init; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StepBase{TInput}"/> class.
@@ -157,7 +158,7 @@ namespace DeepResearchAgent.Steps
         /// Gets the logger instance used for logging step execution information and errors.
         /// The logger is initialized with the step's unique identifier as the category name.
         /// </summary>
-        public ILogger Logger { get; init; }
+        protected ILogger Logger { get; init; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StepBase{TInput, TOutput}"/> class.
@@ -256,6 +257,118 @@ namespace DeepResearchAgent.Steps
                 WriteIndented = true
             }
                 ) ?? throw new InvalidOperationException($"{typeof(TResponse).Name} deserialization returned null.");
+        }
+    }
+
+    /// <summary>
+    /// Abstract base class for workflow steps that process input without producing output and utilize an AI agent.
+    /// Provides built-in AI agent management, thread handling, logging, and exception handling capabilities.
+    /// </summary>
+    /// <typeparam name="TInput">The type of input message this step processes.</typeparam>
+    /// <remarks>
+    /// This class extends <see cref="StepBase{TInput}"/> and adds AI agent functionality through the <see cref="AIAgent"/> class.
+    /// Each instance maintains its own agent thread for conversation continuity. If no thread is provided during construction,
+    /// a new thread is automatically created.
+    /// Derived classes have access to the <see cref="Agent"/> and <see cref="Thread"/> properties to interact with the AI agent.
+    /// </remarks>
+    public abstract class AgentStepBase<TInput> : StepBase<TInput>
+    {
+        private readonly AIAgent _aiAgent;
+
+        /// <summary>
+        /// Gets the AI agent instance used for processing within this step.
+        /// </summary>
+        /// <remarks>
+        /// This property provides access to the AI agent's capabilities, including generating responses,
+        /// executing functions, and managing conversations.
+        /// </remarks>
+        protected AIAgent Agent { get; init; }
+
+        /// <summary>
+        /// Gets the agent thread used to maintain conversation context and state for this step.
+        /// </summary>
+        /// <remarks>
+        /// The thread represents a persistent conversation context that spans multiple interactions with the agent.
+        /// If no thread is provided during construction, a new thread is automatically created.
+        /// </remarks>
+        protected AgentThread Thread { get; init; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AgentStepBase{TInput}"/> class.
+        /// </summary>
+        /// <param name="id">The unique identifier for this step instance.</param>
+        /// <param name="agent">The AI agent instance used for processing. Cannot be null.</param>
+        /// <param name="loggerFactory">The logger factory used to create the logger for this step. Cannot be null.</param>
+        /// <param name="thread">Optional agent thread for maintaining conversation context. If null, a new thread is created automatically.</param>
+        /// <param name="options">Optional configuration options for the executor.</param>
+        /// <param name="declareCrossRunShareable">Indicates whether this step's state can be shared across workflow runs.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="agent"/> or <paramref name="loggerFactory"/> is null.</exception>
+        /// <remarks>
+        /// The constructor automatically creates a new agent thread if one is not provided, ensuring that each step
+        /// has a valid conversation context for interacting with the AI agent.
+        /// </remarks>
+        protected AgentStepBase(string id, AIAgent agent, ILoggerFactory loggerFactory, AgentThread thread = default!, ExecutorOptions? options = null, bool declareCrossRunShareable = false) : base(id, loggerFactory, options, declareCrossRunShareable)
+        {
+            _aiAgent = agent ?? throw new ArgumentNullException(nameof(agent));
+            Agent = _aiAgent;
+            Thread = thread ?? _aiAgent.GetNewThread();
+        }
+    }
+
+    /// <summary>
+    /// Abstract base class for workflow steps that process input, produce output, and utilize an AI agent.
+    /// Provides built-in AI agent management, thread handling, logging, and exception handling capabilities.
+    /// </summary>
+    /// <typeparam name="TInput">The type of input message this step processes.</typeparam>
+    /// <typeparam name="TOutput">The type of output this step produces.</typeparam>
+    /// <remarks>
+    /// This class extends <see cref="StepBase{TInput, TOutput}"/> and adds AI agent functionality through the <see cref="AIAgent"/> class.
+    /// Each instance maintains its own agent thread for conversation continuity. If no thread is provided during construction,
+    /// a new thread is automatically created.
+    /// Derived classes have access to the <see cref="Agent"/> and <see cref="Thread"/> properties to interact with the AI agent
+    /// and produce output based on agent responses.
+    /// </remarks>
+    public abstract class AgentStepBase<TInput, TOutput> : StepBase<TInput, TOutput>
+    {
+        private readonly AIAgent _aiAgent;
+
+        /// <summary>
+        /// Gets the AI agent instance used for processing within this step.
+        /// </summary>
+        /// <remarks>
+        /// This property provides access to the AI agent's capabilities, including generating responses,
+        /// executing functions, and managing conversations.
+        /// </remarks>
+        protected AIAgent Agent { get; init; }
+
+        /// <summary>
+        /// Gets the agent thread used to maintain conversation context and state for this step.
+        /// </summary>
+        /// <remarks>
+        /// The thread represents a persistent conversation context that spans multiple interactions with the agent.
+        /// If no thread is provided during construction, a new thread is automatically created.
+        /// </remarks>
+        protected AgentThread Thread { get; init; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AgentStepBase{TInput, TOutput}"/> class.
+        /// </summary>
+        /// <param name="id">The unique identifier for this step instance.</param>
+        /// <param name="agent">The AI agent instance used for processing. Cannot be null.</param>
+        /// <param name="loggerFactory">The logger factory used to create the logger for this step. Cannot be null.</param>
+        /// <param name="thread">Optional agent thread for maintaining conversation context. If null, a new thread is created automatically.</param>
+        /// <param name="options">Optional configuration options for the executor.</param>
+        /// <param name="declareCrossRunShareable">Indicates whether this step's state can be shared across workflow runs.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="agent"/> or <paramref name="loggerFactory"/> is null.</exception>
+        /// <remarks>
+        /// The constructor automatically creates a new agent thread if one is not provided, ensuring that each step
+        /// has a valid conversation context for interacting with the AI agent.
+        /// </remarks>
+        protected AgentStepBase(string id, AIAgent agent, ILoggerFactory loggerFactory, AgentThread thread = default!, ExecutorOptions? options = null, bool declareCrossRunShareable = false) : base(id, loggerFactory, options, declareCrossRunShareable)
+        {
+            _aiAgent = agent ?? throw new ArgumentNullException(nameof(agent));
+            Agent = _aiAgent;
+            Thread = thread ?? _aiAgent.GetNewThread();
         }
     }
 }
