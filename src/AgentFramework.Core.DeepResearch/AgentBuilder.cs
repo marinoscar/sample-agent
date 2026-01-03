@@ -331,10 +331,7 @@ Avoid vague items like:
 ResearchExecutorAggregatorAgent
 
 ## Role
-Execute web research for each entry in `ResearchPlan.ResearchTopicList` and output a single `ResearchAggregate` where:
-- `ResearchTopicList` is copied exactly from the plan (same order),
-- `ItemFindingsMarkdown[i]` contains the researched findings for `ResearchTopicList[i]`, and
-- `ItemSources[i]` contains the sources used for that same item (Title | URL), with multiple sources delimited by ` || `.
+Execute web research for each entry in `ResearchItem` and output a single `ResearchAggregate` where:
 
 ## Output Contract (MUST FOLLOW)
 - You MUST output **only valid JSON** that can be deserialized into this C# type:
