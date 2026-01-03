@@ -77,12 +77,12 @@ namespace AgentFramework.Terminal
         /// <param name="app">The host application instance.</param>
         static void RunConsole(ConsoleOptions arguments, IHost app)
         {
-            var workflowBuilder = new DeepResearchWorkflow(app.Services); 
+            var workflowBuilder = new DeepResearchWorkflow(app.Services);
             var workflow = workflowBuilder.Build();
             var prompt = "Write a detailed research report on the impact of climate change on global agriculture.";
-            var message = new TextContent(prompt);
+            var message = new ChatMessage(ChatRole.User, [new TextContent(prompt)]);
             var run = InProcessExecution.RunAsync(workflow, message).GetAwaiter().GetResult();
-            foreach(var evt in run.OutgoingEvents)
+            foreach (var evt in run.OutgoingEvents)
             {
                 Console.WriteLine(evt.Data);
             }
