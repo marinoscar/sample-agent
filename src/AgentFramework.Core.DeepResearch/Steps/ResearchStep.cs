@@ -38,7 +38,7 @@ namespace AgentFramework.Core.DeepResearch.Steps
                     ResearchItem = researchItem, PlannerNotes = message.PlannerNotes
                 };
 
-                var jsonInput = Serialize(researchItem);
+                var jsonInput = Serialize(task);
                 var response = await Agent.RunAsync(jsonInput, cancellationToken: cancellationToken);
                 var aggregate = Deserialize<ResearchAggregate>(response.Text);
 
