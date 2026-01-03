@@ -124,12 +124,54 @@ namespace AgentFramework.Core.Workflows
         /// </remarks>
         protected virtual TResponse Deserialize<TResponse>(string input)
         {
-            return JsonSerializer.Deserialize<TResponse>(input, new JsonSerializerOptions() { 
+            return JsonSerializer.Deserialize<TResponse>(input, GetSerializerOptions()) 
+                ?? throw new InvalidOperationException($"{typeof(TResponse).Name} deserialization returned null.");
+        }
+
+        /// <summary>
+        /// Gets the default JSON serializer options used for serialization and deserialization.
+        /// </summary>
+        /// <returns>An instance of <see cref="JsonSerializerOptions"/> configured with default settings.</returns>
+        protected virtual JsonSerializerOptions GetSerializerOptions()
+        {
+            return new JsonSerializerOptions()
+            {
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true
-            }
-                ) ?? throw new InvalidOperationException($"{typeof(TResponse).Name} deserialization returned null.");
+            };
+        }
+
+                /// <summary>
+        /// Serializes an object to a JSON string using the specified JSON serializer options.
+        /// </summary>
+        /// <param name="item">The object to serialize. Can be of any type that is JSON-serializable.</param>
+        /// <param name="options">Custom JSON serialization options to control the serialization behavior, including property naming policies, reference handling, and formatting.</param>
+        /// <returns>A JSON string representation of the <paramref name="item"/>.</returns>
+        /// <exception cref="NotSupportedException">Thrown when the object type cannot be serialized to JSON.</exception>
+        /// <remarks>
+        /// This overload allows full control over the serialization process through the <paramref name="options"/> parameter.
+        /// Use this method when you need specific serialization settings that differ from the default behavior.
+        /// </remarks>
+        protected virtual string Serialize(object item, JsonSerializerOptions options)
+        {
+            return JsonSerializer.Serialize(item, options);
+        }
+
+        /// <summary>
+        /// Serializes an object to a JSON string using the default JSON serializer options.
+        /// </summary>
+        /// <param name="item">The object to serialize. Can be of any type that is JSON-serializable.</param>
+        /// <returns>A JSON string representation of the <paramref name="item"/>.</returns>
+        /// <exception cref="NotSupportedException">Thrown when the object type cannot be serialized to JSON.</exception>
+        /// <remarks>
+        /// This method uses the default serialization options defined by <see cref="GetSerializerOptions"/>, which includes:
+        /// camelCase property naming, indented formatting, and circular reference handling.
+        /// For custom serialization behavior, use the <see cref="Serialize(object, JsonSerializerOptions)"/> overload.
+        /// </remarks>
+        protected virtual string Serialize(object item)
+        {
+            return JsonSerializer.Serialize(item, GetSerializerOptions());
         }
 
 
@@ -250,13 +292,54 @@ namespace AgentFramework.Core.Workflows
         /// </remarks>
         protected virtual TResponse Deserialize<TResponse>(string input)
         {
-            return JsonSerializer.Deserialize<TResponse>(input, new JsonSerializerOptions()
+            return JsonSerializer.Deserialize<TResponse>(input, GetSerializerOptions())
+                ?? throw new InvalidOperationException($"{typeof(TResponse).Name} deserialization returned null.");
+        }
+
+        /// <summary>
+        /// Gets the default JSON serializer options used for serialization and deserialization.
+        /// </summary>
+        /// <returns>An instance of <see cref="JsonSerializerOptions"/> configured with default settings.</returns>
+        protected virtual JsonSerializerOptions GetSerializerOptions()
+        {
+            return new JsonSerializerOptions()
             {
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true
-            }
-                ) ?? throw new InvalidOperationException($"{typeof(TResponse).Name} deserialization returned null.");
+            };
+        }
+
+        /// <summary>
+        /// Serializes an object to a JSON string using the specified JSON serializer options.
+        /// </summary>
+        /// <param name="item">The object to serialize. Can be of any type that is JSON-serializable.</param>
+        /// <param name="options">Custom JSON serialization options to control the serialization behavior, including property naming policies, reference handling, and formatting.</param>
+        /// <returns>A JSON string representation of the <paramref name="item"/>.</returns>
+        /// <exception cref="NotSupportedException">Thrown when the object type cannot be serialized to JSON.</exception>
+        /// <remarks>
+        /// This overload allows full control over the serialization process through the <paramref name="options"/> parameter.
+        /// Use this method when you need specific serialization settings that differ from the default behavior.
+        /// </remarks>
+        protected virtual string Serialize(object item, JsonSerializerOptions options)
+        {
+            return JsonSerializer.Serialize(item, options);
+        }
+
+        /// <summary>
+        /// Serializes an object to a JSON string using the default JSON serializer options.
+        /// </summary>
+        /// <param name="item">The object to serialize. Can be of any type that is JSON-serializable.</param>
+        /// <returns>A JSON string representation of the <paramref name="item"/>.</returns>
+        /// <exception cref="NotSupportedException">Thrown when the object type cannot be serialized to JSON.</exception>
+        /// <remarks>
+        /// This method uses the default serialization options defined by <see cref="GetSerializerOptions"/>, which includes:
+        /// camelCase property naming, indented formatting, and circular reference handling.
+        /// For custom serialization behavior, use the <see cref="Serialize(object, JsonSerializerOptions)"/> overload.
+        /// </remarks>
+        protected virtual string Serialize(object item)
+        {
+            return JsonSerializer.Serialize(item, GetSerializerOptions());
         }
     }
 
