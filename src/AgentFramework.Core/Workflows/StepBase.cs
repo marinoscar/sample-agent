@@ -12,7 +12,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace DeepResearchAgent.Steps
+namespace AgentFramework.Core.Workflows
 {
     /// <summary>
     /// Abstract base class for workflow steps that process input without producing output.
