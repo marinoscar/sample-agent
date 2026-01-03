@@ -2,6 +2,7 @@
 using AgentFramework.Core.DeepResearch.Steps;
 using AgentFramework.Core.Workflows;
 using Microsoft.Agents.AI.Workflows;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,13 @@ namespace AgentFramework.Core.DeepResearch
 {
     public class DeepResearchWorkflow : AgentWorkflowBase
     {
+
+        public DeepResearchWorkflow(IServiceProvider services) : 
+            this(services.GetRequiredService<AgentFactory>(), services.GetRequiredService<ILoggerFactory>())
+        {
+            
+        }
+
         public DeepResearchWorkflow(AgentFactory agentFactory, ILoggerFactory loggerFactory) : base("DeepResearchAgent", "Deep Research Agent", agentFactory, loggerFactory)
         {
         }
